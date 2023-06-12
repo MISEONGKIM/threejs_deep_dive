@@ -1,12 +1,11 @@
 import * as THREE from "three";
 
 export class Earth {
-  constructor({ scene, textureLoader }) {
-    this.scene = scene;
+  constructor({ textureLoader }) {
     this.textureLoader = textureLoader;
   }
 
-  createEarth({ materialOpt = {}, geometryOpt = {} }) {
+  create({ materialOpt = {}, geometryOpt = {} }) {
     const material = new THREE.MeshStandardMaterial({
       ...materialOpt,
       map: this.textureLoader.load("assets/earth-night-map.jpg"),
@@ -15,14 +14,13 @@ export class Earth {
     });
     const geometry = new THREE.SphereGeometry(geometryOpt.radius, 30, 30);
     this.mesh = new THREE.Mesh(geometry, material);
-
-    this.scene.add(this.mesh);
+    this.mesh.rotation.y = -Math.PI / 2;
   }
 
-  addLight() {
+  addLight({ scene }) {
     this.light = new THREE.DirectionalLight(0xffffff, 1);
     this.light.position.set(2.65, 2.13, 1.02);
 
-    this.scene.add(this.light);
+    scene.add(this.light);
   }
 }

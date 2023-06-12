@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Earth } from "./earth.js";
 import { Star } from "./star.js";
+import { Point } from "./point";
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -61,12 +62,12 @@ export default function () {
     window.addEventListener("resize", resize);
   };
 
-  const draw = () => {
-    earth1.mesh.rotation.x += 0.0005;
-    earth1.mesh.rotation.y += 0.0005;
+  const group = new THREE.Group();
+  const stars = new Star({ scene, textureLoader });
 
-    earth2.mesh.rotation.x += 0.0005;
-    earth2.mesh.rotation.y += 0.0005;
+  const draw = () => {
+    group.rotation.x += 0.0005;
+    group.rotation.y += 0.0005;
 
     stars.points.rotation.x += 0.001;
     stars.points.rotation.y += 0.001;
@@ -78,17 +79,18 @@ export default function () {
     });
   };
 
-  const earth1 = new Earth({ scene, textureLoader });
-  const earth2 = new Earth({ scene, textureLoader });
-  const stars = new Star({ scene, textureLoader });
+  const create = () => {
+    const earth1 = new Earth({ textureLoader });
+    const earth2 = new Earth({ textureLoader });
+    const point1 = new Point();
+    const point2 = new Point();
 
-  const initialize = () => {
-    earth1.createEarth({
+    earth1.create({
       geometryOpt: { radius: 1.3 },
     });
-    earth1.addLight();
+    earth1.addLight({ scene });
 
-    earth2.createEarth({
+    earth2.create({
       materialOpt: {
         opacity: 0.9,
         transparent: true,
@@ -98,8 +100,32 @@ export default function () {
       geometryOpt: { radius: 1.5 },
     });
 
-    stars.createStars();
+    stars.create();
+    // 서울의 위도(lat)와 경도(lng) 좌표
+    point1.create({
+      point: {
+        //라디안 변환
+        lat: 37.56668 * (Math.PI / 180),
+        lng: 126.97841 * (Math.PI / 180),
+      },
+    });
+    point1.mesh.rotation.set(0.9, 2.46, 1);
+    //가나 위도/경도
+    point2.create({
+      point: {
+        //라디안 변환
+        lat: 5.55363 * (Math.PI / 180),
+        lng: -0.196481 * (Math.PI / 180),
+      },
+    });
+    point1.createCurve(point2.mesh.position);
 
+    group.add(earth1.mesh, earth2.mesh, point1.mesh, point2.mesh, point1.curve);
+
+    scene.add(group);
+  };
+  const initialize = () => {
+    create();
     addEvent();
     resize();
     draw();
