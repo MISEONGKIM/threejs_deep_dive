@@ -1,15 +1,17 @@
 import * as THREE from "three";
 
 export class Earth {
-  constructor({ scene }) {
+  constructor({ scene, textureLoader }) {
     this.scene = scene;
+    this.textureLoader = textureLoader;
   }
 
-  createEarth({ materialOpt, geometryOpt }) {
+  createEarth({ materialOpt = {}, geometryOpt = {} }) {
     const material = new THREE.MeshStandardMaterial({
       ...materialOpt,
+      map: this.textureLoader.load("assets/earth-night-map.jpg"),
       roughness: 0,
-      metalness: 0
+      metalness: 0,
     });
     const geometry = new THREE.SphereGeometry(geometryOpt.radius, 30, 30);
     this.mesh = new THREE.Mesh(geometry, material);
