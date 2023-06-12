@@ -1,1 +1,1 @@
-# threejs_deep_dive
+# threejs 심화 강의
