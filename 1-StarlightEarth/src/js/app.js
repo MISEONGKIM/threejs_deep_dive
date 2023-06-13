@@ -3,12 +3,20 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Earth } from "./earth.js";
 import { Star } from "./star.js";
 import { Point } from "./point";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { FilmPass } from "three/examples/jsm/postprocessing/FilmPass.js";
+import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass.js";
+import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass.js";
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
   });
   renderer.outputEncoding = THREE.sRGBEncoding;
+  const effectComposer = new EffectComposer(renderer);
 
   const textureLoader = new THREE.TextureLoader();
   const cubeTextureLoader = new THREE.CubeTextureLoader();
@@ -47,6 +55,25 @@ export default function () {
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
+  //후처리
+  const addPostEffects = () => {
+    const renderPass = new RenderPass(scene, camera);
+    effectComposer.addPass(renderPass);
+
+    const filmPass = new FilmPass(1, 1, 4096, false);
+    // effectComposer.addPass(filmPass);
+
+    const shaderPass = new ShaderPass(GammaCorrectionShader);
+    const glitchPass = new GlitchPass();
+    // effectComposer.addPass(glitchPass);
+    // glitchPass.goWild = true;
+
+    const afterimagePass = new AfterimagePass(0.96);
+    // effectComposer.addPass(afterimagePass);
+
+    effectComposer.addPass(shaderPass);
+  };
+
   const resize = () => {
     canvasSize.width = window.innerWidth;
     canvasSize.height = window.innerHeight;
@@ -56,6 +83,7 @@ export default function () {
 
     renderer.setSize(canvasSize.width, canvasSize.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    effectComposer.setSize(canvasSize.width, canvasSize.height);
   };
 
   const addEvent = () => {
@@ -73,7 +101,8 @@ export default function () {
     stars.points.rotation.y += 0.001;
 
     controls.update();
-    renderer.render(scene, camera);
+
+    effectComposer.render();
     requestAnimationFrame(() => {
       draw();
     });
@@ -126,6 +155,7 @@ export default function () {
   };
   const initialize = () => {
     create();
+    addPostEffects();
     addEvent();
     resize();
     draw();

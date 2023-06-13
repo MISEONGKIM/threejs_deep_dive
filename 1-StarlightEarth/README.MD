@@ -100,3 +100,9 @@
     return canvas;
   }
 ```
+
+## 포스트 프로세싱(후처리)
+
+- FilmPass : 영화 필름같은 느낌
+- GlitchPass : 컴퓨터 화면 오류났을 때 지지직 거리는 느낌
+- AfterimagePass : 잔상 효과
