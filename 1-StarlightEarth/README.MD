@@ -103,6 +103,19 @@
 
 ## 포스트 프로세싱(후처리)
 
-- FilmPass : 영화 필름같은 느낌
-- GlitchPass : 컴퓨터 화면 오류났을 때 지지직 거리는 느낌
+Pass는 포스트 프로세싱에서 효과와 같은 의미라고 생각하면 됨.
+
+### 기본설정
+
+- EffectComposer : 효과를 관리하는 매니저
+
+* RenderPass : 현재 어떤 scene과 camera를 사용하는 지 넘겨주기 위해 사용
+
+### Pass 종류
+
+- FilmPass : 영화 필름의 노이즈한 느낌
+
+* shaderPass : 쉐이더를 추가하기 위함
+
+- GlitchPass : 컴퓨터 고장났을 때 화면 지지직 거리는 느낌
 - AfterimagePass : 잔상 효과

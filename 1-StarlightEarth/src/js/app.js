@@ -63,6 +63,7 @@ export default function () {
     const filmPass = new FilmPass(1, 1, 4096, false);
     // effectComposer.addPass(filmPass);
 
+    // GammaCorrectionShader : 빛의 감도 신호를 보정
     const shaderPass = new ShaderPass(GammaCorrectionShader);
     const glitchPass = new GlitchPass();
     // effectComposer.addPass(glitchPass);
