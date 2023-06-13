@@ -104,18 +104,59 @@
 ## 포스트 프로세싱(후처리)
 
 Pass는 포스트 프로세싱에서 효과와 같은 의미라고 생각하면 됨.
+Renderer는 카메라를 통해 Scene의 snapshot을 찍는데, 이를 Render Target이라고 한다.
+이때 이를 canvas에 그리기 전에 우리는 filter를 통해 몇 가지 작업을 추가할 수 있는데 이게 포스트 프로세싱임.
 
 ### 기본설정
 
 - EffectComposer : 효과를 관리하는 매니저
 
 * RenderPass : 현재 어떤 scene과 camera를 사용하는 지 넘겨주기 위해 사용
+* effectComposer.render()
+  - renderer.render(scene, camera) 렌더기능 위임
+  * render의 encoding 정보(renderer.outputEncoding = THREE.sRGBEncoding)를 따로 설정해주었다면 Render Target을 도중에 가로채기 때문에 지정한 encoding으로 렌더링 되지 않을 수 있음
+    - GammaCorrectionShader로 해결, 이는 밝게 ? 빛 효과 줌. pass효과 주고나서 어디에 놓을 지는 개발자의 판단
+    ```
+       const shaderPass = new ShaderPass(GammaCorrectionShader);
+    ```
+
+```
+effectComposer.setSize(canvasSize.width, canvasSize.height);
+
+const renderPass = new RenderPass(scene, camera);
+
+effectComposer.addPass(renderPass);
+
+effectComposer.render();
+```
+
+### 앤티앨리어싱 적용
+
+개체의 가장자리가 각져보이는(계단처럼) 현상을 매끄럽게 처리
+
+```
+  const renderTarget = new THREE.WebGLRenderTarget(
+    canvasSize.width,
+    canvasSize.height,
+    {
+      samples: 2,
+    }
+  );
+  const effectComposer = new EffectComposer(renderer, renderTarget);
+```
 
 ### Pass 종류
 
 - FilmPass : 영화 필름의 노이즈한 느낌
-
-* shaderPass : 쉐이더를 추가하기 위함
-
 - GlitchPass : 컴퓨터 고장났을 때 화면 지지직 거리는 느낌
 - AfterimagePass : 잔상 효과
+
+* HalftonePass: 텍스처의 질감을 미술관에 있는 그림같은 느낌
+* UnrealBloomPass : 빛의 노출 값을 조절해서 물체의 밝기를 원하는대로 조절해 줄 수 있는 효과
+  - strength :빛의 밝기
+  - threshold : 사물의 빛나는 영역(임계값)
+  * radius :빛의 번지는 정도
+* **OutlinePass : 실무에서 많이 사용. 물체의 외곽선을 그려주는 효과**
+  - 보통 사용자가 마우스를 클릭한 물체가 무엇인 지 알려줄 때 사용하는 편
+  * OutlinePass 적용 시 또 앨리어싱 문제 발생,
+  * SMAAPass : 앤티앨리어싱 적용

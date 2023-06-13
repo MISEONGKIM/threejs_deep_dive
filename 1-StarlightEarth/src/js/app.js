@@ -6,11 +6,22 @@ import { Point } from "./point";
 import { PostProcessing } from "./postProcessing.js";
 
 export default function () {
+  const canvasSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
   });
   renderer.outputEncoding = THREE.sRGBEncoding;
-
+  const renderTarget = new THREE.WebGLRenderTarget(
+    canvasSize.width,
+    canvasSize.height,
+    {
+      samples: 2,
+    }
+  );
   const textureLoader = new THREE.TextureLoader();
   const cubeTextureLoader = new THREE.CubeTextureLoader();
   const environmentMap = cubeTextureLoader.load([
@@ -26,11 +37,6 @@ export default function () {
   const container = document.querySelector("#container");
 
   container.appendChild(renderer.domElement);
-
-  const canvasSize = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
 
   const scene = new THREE.Scene();
   scene.background = environmentMap;
@@ -48,7 +54,16 @@ export default function () {
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
-  const postProcessing = new PostProcessing({ renderer, scene, camera });
+  const group = new THREE.Group();
+
+  const postProcessing = new PostProcessing({
+    renderTarget,
+    renderer,
+    scene,
+    camera,
+    canvasSize,
+    earthGroup: group,
+  });
 
   const resize = () => {
     canvasSize.width = window.innerWidth;
@@ -66,7 +81,6 @@ export default function () {
     window.addEventListener("resize", resize);
   };
 
-  const group = new THREE.Group();
   const stars = new Star({ scene, textureLoader });
 
   const draw = () => {
