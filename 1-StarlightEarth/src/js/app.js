@@ -104,6 +104,7 @@ export default function () {
     const progress = timeElampsed / 2.5; // 2.5초동안 애니메이션 실행
     const speed = 3;
 
+    //960 은 커브 총 count갯수
     drawRangeCount = progress * speed * 960;
 
     point1.curve.geometry.setDrawRange(0, drawRangeCount);
