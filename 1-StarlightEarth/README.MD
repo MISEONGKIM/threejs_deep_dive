@@ -1,4 +1,4 @@
-## 지구 만들기
+# 지구 만들기 basic
 
 - BufferGeometry()의 position 설정 시 유의점
 
@@ -161,7 +161,7 @@ effectComposer.render();
   * OutlinePass 적용 시 또 앨리어싱 문제 발생,
   * SMAAPass : 앤티앨리어싱 적용
 
-## 커스텀 셰이더
+## 커스텀 셰이더(포스트 프로세싱을 이용하여 씬 전체에 셰이더 적용)
 
 ### vertexShader, fragmentShader
 
@@ -176,7 +176,7 @@ effectComposer.render();
 ```
    customPass = () => {
     /**
-     * position 변수는 내장되어있어서 사용할 수 있음
+     * position 변수(정점 데이터)는 내장되어있어서 사용할 수 있음
      *
      */
     const customShaderPass = new ShaderPass({
