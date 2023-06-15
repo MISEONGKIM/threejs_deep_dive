@@ -2,9 +2,11 @@
 
 앞선 프로젝트 1-StarlightEarth에서는 포스트 프로세싱을 이용해서 셰이더를 scene 전체에 적용하는 방식(ShaderPass이용), 해당 프로젝트에선 **각각 mesh에 셰이더를 적용하는 방식**
 
-## RawShaderMaterial, ShaderMaterial라는 재질을 사용하면 셰이더 효과 입힐 수 있음.
+## RawShaderMaterial, ShaderMaterial
 
-- 아래 코드처럼 조회해보면, data에 vertexShader, fragmentShader, uniforms 값이 있음, 셰이더 코드를 이미 사용하고 있는 것 !
+- RawShaderMaterial, ShaderMaterial라는 재질을 사용하면 셰이더 효과 입힐 수 있음.
+
+* 아래 코드처럼 조회해보면, data에 vertexShader, fragmentShader, uniforms 값이 있음, 셰이더 코드를 이미 사용하고 있는 것 !
   - 즉, threejs는 우리가 셰이더를 만들기 이전에 먼저 몇가지 프리셋을 작성해놓고 있던 거임!
   * MeshBasicMaterial도 결국 glsl 언어로 구현된 셰이더 코드로 작성한 프로그램을 전달해주는 개체의 역할을 한다는 거임.
   * 즉, 직접 셰이더 만들어서 커스텀 Material 생성 가능하다는 거임 ! 그때 이용하는 게 => RawShaderMaterial, ShaderMaterial
@@ -22,6 +24,7 @@
 ### RawShaderMaterial
 
 - ShaderMaterial과 달리 미리 전역으로 사용하는 uniforms와 attributes 같은 값이 따로 정의되어 있지 않음
+  - attributes: vertexShader에서만 사용 가능함 ! fragmentShader에서 사용하려면 varying으로 vertexShader -> fragmentShader 넘겨주어야함
 
 * gl_Position : 클립공간에서 정점의 위치를 지정하는 정점 셰이더의 특수한 전역 변수
 * projectionMatrix : 3D 장면이 2D 뷰포트에 투영되는 방식을 제어하는 데 사용, 2D의 클립공간 좌표를 만드는 역할을 함, 공간 좌표를 만들기 위해 가장 먼저 가져와야하는 좌표
@@ -53,3 +56,43 @@
      `
     });
 ```
+
+## glsl 파일 import
+
+- 끝에 raw키워드로 import하면 플러그인 없이도 사용가능함.
+  - 이전 프로젝트에선 vite-plugin-glsl 설치해서 사용했었음
+
+```
+  import vertexShader from "./shaders/vertex.glsl?raw";
+  import fragmentShader from "./shaders/fragment.glsl?raw";
+```
+
+## mesh의 포지션 변경
+
+- vertexShader에서 변경
+
+```
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform mat4 modelViewMatrix;
+attribute vec3 position; //BufferGeometry에서 제공해주는 정점의 위치값
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  modelPosition.x += 1.0;
+
+  gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+}
+```
+
+- mesh의 position 으로 변경
+
+```
+ mesh.position.y = 1;
+```
+
+- 위 두가지 방법을 결과로 보면 큰 차이 없지만 다르다 !
+
+* **mesh position이 mesh라는 하나의 모델(만들어진 한 덩어리)의 위치를 바꾸는 것이라면, vertexShader는 모든 정점(한 덩어리를 이루는)의 위치를 바꾸는 것**
