@@ -356,3 +356,7 @@ const customShaderPass = new ShaderPass({
       ` //픽셀마다 색 입힘
     });
 ```
+
+## ETC
+
+- geometry.setDrawRange() : 영역을 어디까지 그릴 건지 정하는 함수

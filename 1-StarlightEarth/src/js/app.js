@@ -8,18 +8,18 @@ import { PostProcessing } from "./postProcessing.js";
 export default function () {
   const canvasSize = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   };
 
   const renderer = new THREE.WebGLRenderer({
-    alpha: true,
+    alpha: true
   });
   renderer.outputEncoding = THREE.sRGBEncoding;
   const renderTarget = new THREE.WebGLRenderTarget(
     canvasSize.width,
     canvasSize.height,
     {
-      samples: 2,
+      samples: 2
     }
   );
   const textureLoader = new THREE.TextureLoader();
@@ -30,7 +30,7 @@ export default function () {
     "assets/environments/py.png",
     "assets/environments/ny.png",
     "assets/environments/pz.png",
-    "assets/environments/nz.png",
+    "assets/environments/nz.png"
   ]);
   environmentMap.encoding = THREE.sRGBEncoding;
 
@@ -55,6 +55,10 @@ export default function () {
   controls.dampingFactor = 0.1;
 
   const group = new THREE.Group();
+  const earth1 = new Earth({ textureLoader });
+  const earth2 = new Earth({ textureLoader });
+  const point1 = new Point();
+  const point2 = new Point();
 
   const postProcessing = new PostProcessing({
     renderTarget,
@@ -62,7 +66,7 @@ export default function () {
     scene,
     camera,
     canvasSize,
-    earthGroup: group,
+    earthGroup: group
   });
 
   const resize = () => {
@@ -83,6 +87,7 @@ export default function () {
 
   const stars = new Star({ scene, textureLoader });
 
+  const clock = new THREE.Clock();
   const draw = () => {
     group.rotation.x += 0.0005;
     group.rotation.y += 0.0005;
@@ -91,21 +96,32 @@ export default function () {
     stars.points.rotation.y += 0.001;
 
     controls.update();
-
     postProcessing.effectComposer.render();
+
+    const timeElampsed = clock.getElapsedTime();
+    let drawRangeCount = point1.curve.geometry.drawRange.count;
+    console.log(point1.curve.geometry.drawRange.count);
+    const progress = timeElampsed / 2.5; // 2.5초동안 애니메이션 실행
+    const speed = 3;
+
+    drawRangeCount = progress * speed * 960;
+
+    point1.curve.geometry.setDrawRange(0, drawRangeCount);
+
+    if (timeElampsed > 4) {
+      point1.mesh.material.opacity = 5 - timeElampsed;
+      point2.mesh.material.opacity = 5 - timeElampsed;
+      point1.curve.material.opacity = 5 - timeElampsed;
+    }
+
     requestAnimationFrame(() => {
       draw();
     });
   };
 
   const create = () => {
-    const earth1 = new Earth({ textureLoader });
-    const earth2 = new Earth({ textureLoader });
-    const point1 = new Point();
-    const point2 = new Point();
-
     earth1.create({
-      geometryOpt: { radius: 1.3 },
+      geometryOpt: { radius: 1.3 }
     });
     earth1.addLight({ scene });
 
@@ -114,9 +130,9 @@ export default function () {
         opacity: 0.9,
         transparent: true,
         //작은 지구의 앞면이 보이기 위해 바깥 지구에서 뒤쪽부분만 렌더링하고 앞쪽 부분은 렌더링 하지않도록 만듬
-        side: THREE.BackSide,
+        side: THREE.BackSide
       },
-      geometryOpt: { radius: 1.5 },
+      geometryOpt: { radius: 1.5 }
     });
 
     stars.create();
@@ -125,8 +141,8 @@ export default function () {
       point: {
         //라디안 변환
         lat: 37.56668 * (Math.PI / 180),
-        lng: 126.97841 * (Math.PI / 180),
-      },
+        lng: 126.97841 * (Math.PI / 180)
+      }
     });
     point1.mesh.rotation.set(0.9, 2.46, 1);
     //가나 위도/경도
@@ -134,8 +150,8 @@ export default function () {
       point: {
         //라디안 변환
         lat: 5.55363 * (Math.PI / 180),
-        lng: -0.196481 * (Math.PI / 180),
-      },
+        lng: -0.196481 * (Math.PI / 180)
+      }
     });
     point1.createCurve(point2.mesh.position);
 

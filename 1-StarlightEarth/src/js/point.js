@@ -8,6 +8,7 @@ export class Point {
     const geometry = new THREE.TorusGeometry(0.02, 0.002, 20, 20);
     const material = new THREE.MeshBasicMaterial({
       color: 0x263d64,
+      transparent: true
     });
 
     this.mesh = new THREE.Mesh(geometry, material);
@@ -58,6 +59,7 @@ export class Point {
 
     const metarial = new THREE.MeshBasicMaterial({
       map: texture,
+      transparent: true
     });
 
     this.curve = new THREE.Mesh(geometry, metarial);

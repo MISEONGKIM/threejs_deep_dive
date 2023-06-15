@@ -28,8 +28,8 @@ export class PostProcessing {
     this.canvasSize = canvasSize;
   }
   addPass = () => {
-    const filmPass = new FilmPass(1, 1, 4096, false);
-    // this.effectComposer.addPass(filmPass);
+    const filmPass = new FilmPass(1, 1, 2000, false);
+    this.effectComposer.addPass(filmPass);
 
     // GammaCorrectionShader : 빛의 감도 신호를 보정
     const shaderPass = new ShaderPass(GammaCorrectionShader);
@@ -37,10 +37,10 @@ export class PostProcessing {
     const unrealBloomPass = new UnrealBloomPass(
       new THREE.Vector2(this.canvasSize.width, this.canvasSize.height)
     );
-    // unrealBloomPass.strength = 1;
-    // unrealBloomPass.threshold = 0.1;
-    // unrealBloomPass.radius = 1;
-    // effectComposer.addPass(unrealBloomPass);
+    unrealBloomPass.strength = 0.4;
+    unrealBloomPass.threshold = 0.2;
+    unrealBloomPass.radius = 0.7;
+    this.effectComposer.addPass(unrealBloomPass);
     this.effectComposer.addPass(shaderPass);
 
     const smaaPass = new SMAAPass();
