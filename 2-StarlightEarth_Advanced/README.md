@@ -57,6 +57,25 @@
     });
 ```
 
+### ShaderMaterial
+
+- 미리 내장된 uniforms 전역 변수들 있음
+
+* RawShaderMaterial에선 아래 변수들 선언해서 사용했는 데, ShaderMaterial 이미 내장된 값을 다시 정의할 필요가 없음.
+
+```
+// vertex
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform mat4 modelViewMatrix;
+attribute vec3 position;
+attribute vec2 uv;
+
+// fragment
+precision mediump float;
+```
+
 ## glsl 파일 import
 
 - 끝에 raw키워드로 import하면 플러그인 없이도 사용가능함.
@@ -96,3 +115,66 @@ void main() {
 - 위 두가지 방법을 결과로 보면 큰 차이 없지만 다르다 !
 
 * **mesh position이 mesh라는 하나의 모델(만들어진 한 덩어리)의 위치를 바꾸는 것이라면, vertexShader는 모든 정점(한 덩어리를 이루는)의 위치를 바꾸는 것**
+
+## glsl 1.0 => glsl 3.0 버전의 문법으로 업그레이드 해주면서 WebGL2를 지원할 수 있도록
+
+- in : 외부에서 내부로 값이 들어온다는 의미
+
+```
+//attribute float aRandomPosition;
+in float aRandomPosition;
+```
+
+- out : 내부에서 외부로 값을 내보낸다.
+
+```
+// varying float vRandomPosition;
+// varying vec2 vUv;
+
+out float vRandomPosition;
+out vec2 vUv;
+```
+
+- glsl 1.0에선 gl_FragColor 사용 못함
+
+```
+
+
+out vec4 myFragColor;
+
+void main() {
+
+  // gl_FragColor = tex* vRandomPosition; //glsl 1.0
+
+  myFragColor = tex* vRandomPosition;
+}
+```
+
+- texture2D() => texture()
+
+```
+  // vec4 tex = texture2D(uTexture, vUv); //glsl 1.0
+  vec4 tex = texture(uTexture, vUv);
+```
+
+- 사용하는 glsl 버전이 무엇인 지 Threejs에 알려주어야 함
+  - glslVersion: THREE.GLSL3
+
+```
+ const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uTexture: { value: textureLoader.load("assets/new-beginnings.jpg") }
+      },
+      color: 0x00ff00,
+      side: THREE.DoubleSide,
+      vertexShader,
+      fragmentShader,
+      glslVersion: THREE.GLSL3
+    });
+```
+
+- webGL2는 webGL1보다 퍼포먼스가 더 뛰어나고 glsl 3.0이상의 문법들을 사용할 수 있다는 장점이 있다.
+
+* 아직까진 webGL2가 아직까진 모든 브라우저에서 지원되지 않고 있다. 이에따라 webGL2를 쓰더라도 webGL1의 호환성을 맞춰주는 작업을 해야함.
+* 강의에선 webGL1 사용하기로 함.

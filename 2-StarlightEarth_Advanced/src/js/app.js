@@ -5,11 +5,12 @@ import fragmentShader from "./shaders/fragment.glsl?raw";
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
-    alpha: true,
+    alpha: true
   });
   renderer.clearColor(0x3333333, 1);
 
   const clock = new THREE.Clock();
+  const textureLoader = new THREE.TextureLoader();
 
   const container = document.querySelector("#container");
 
@@ -17,7 +18,7 @@ export default function () {
 
   const canvasSize = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   };
 
   const scene = new THREE.Scene();
@@ -34,16 +35,19 @@ export default function () {
   controls.dampingFactor = 0.1;
 
   const createObject = () => {
-    const material = new THREE.RawShaderMaterial({
+    const material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
+        uTexture: { value: textureLoader.load("assets/new-beginnings.jpg") }
       },
       color: 0x00ff00,
       side: THREE.DoubleSide,
       vertexShader,
       fragmentShader,
+      glslVersion: THREE.GLSL3
     });
-    const geometry = new THREE.PlaneGeometry(1, 1, 16, 16);
+    //965 / 720 : 이미지 크기에 맞게 비율 조정
+    const geometry = new THREE.PlaneGeometry(1, 965 / 720, 16, 16);
 
     const verticesCount = geometry.attributes.position.count;
     const randomPositions = new Float32Array(verticesCount);
