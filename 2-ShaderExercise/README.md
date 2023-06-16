@@ -1,4 +1,4 @@
-# 지구 만들기 advanced
+# 셰이더 연습1
 
 앞선 프로젝트 1-StarlightEarth에서는 포스트 프로세싱을 이용해서 셰이더를 scene 전체에 적용하는 방식(ShaderPass이용), 해당 프로젝트에선 **각각 mesh에 셰이더를 적용하는 방식**
 
