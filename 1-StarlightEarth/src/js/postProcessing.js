@@ -29,7 +29,7 @@ export class PostProcessing {
   }
   addPass = () => {
     const filmPass = new FilmPass(1, 1, 2000, false);
-    this.effectComposer.addPass(filmPass);
+    // this.effectComposer.addPass(filmPass);
 
     // GammaCorrectionShader : 빛의 감도 신호를 보정
     const shaderPass = new ShaderPass(GammaCorrectionShader);
@@ -40,7 +40,7 @@ export class PostProcessing {
     unrealBloomPass.strength = 0.4;
     unrealBloomPass.threshold = 0.2;
     unrealBloomPass.radius = 0.7;
-    this.effectComposer.addPass(unrealBloomPass);
+    // this.effectComposer.addPass(unrealBloomPass);
     this.effectComposer.addPass(shaderPass);
 
     const smaaPass = new SMAAPass();
