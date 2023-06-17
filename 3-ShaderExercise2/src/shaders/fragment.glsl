@@ -25,14 +25,14 @@ void main()
 //     gl_FragColor = vec4( col, 1.0);
 
     //3. 곡선 만들기
-    float x = vUv.x; 
+    float x = vUv.x * 2.0; 
     float y = vUv.y; 
 
-   vec3 col = vec3(x);
+   vec3 col = vec3(x * x);
    vec3 green= vec3(0.0, 1.0, 0.0);
     float a = 2.0;
 
-   if (y  <= x * a ) {
+   if (y  >= x * x && y - 0.005 <= x * x) {
     col = green;
    }
     gl_FragColor = vec4( col, 1.0);
