@@ -2,6 +2,8 @@
 
 ## glsl 내장 함수
 
+더 많은 함수를 알아보고 싶다면 => https://thebookofshaders.com/
+
 - step() : 텍스처 이미지의 일부분을 잘라주고 싶을 때 사용함
   - 아래 코드는 x가 0.5보다 작으면 0, 크면 1
   - discard : step가 0일 때 검은색 부분은 렌더링 하지 않겠다. 즉 step의 반환 값이 0이면 버리겠다.
@@ -55,12 +57,12 @@
 ```
 
 - clamp()
-  - min, max 같이 사용하는 함수
 
-* 파라미터 3가지
-  - 기준값
-  - 하한선 : 이 값보다 작은 경우 해당 값 반환
-  - 상한선 : 이 값보다 커지는 경우 해당 값 반환
+  - min, max 같이 사용하는 함수
+  - 파라미터 3가지
+    - 기준값
+    - 하한선 : 이 값보다 작은 경우 해당 값 반환
+    - 상한선 : 이 값보다 커지는 경우 해당 값 반환
 
 ```
   float x = vUv.x;
@@ -122,5 +124,35 @@ void main() {
    // 초록 -> 파랑으로 그라데이션처럼 섞임
     vec3 col = mix(green, blue, x);
 
+    gl_FragColor = vec4(col, 1.0);
+```
+
+- fract()
+  - 숫자의 소숫점만 반환해주는 함수
+
+```
+  float x = vUv.x ;
+  float y = vUv.y;
+
+   vec3 col = vec3(fract(x * 7.0));
+   col = step(0.5, col);
+
+
+    gl_FragColor = vec4( col, 1.0);
+```
+
+- distance()
+  - 거리의 크기
+  * 양수값
+  * 아래 코드는 x 값이 0.5에 가까울수록 거리값은 0이 되서 중간이 검은색이 됨. (회색 => 검은색 => 회색 그라데이션)
+    - 회색인 이유 : x의 최소가 0인 데 0.5랑 거리값은 0.5이고, 최대가 1인데 이때도 거리값은 0.5이므로
+
+```
+    float x = vUv.x;
+    float y = vUv.y;
+
+    float dist = distance(x, 0.5);
+
+    vec3 col = vec3(dist);
     gl_FragColor = vec4(col, 1.0);
 ```
