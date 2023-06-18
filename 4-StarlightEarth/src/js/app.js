@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import vertexShader from "../shaders/earth/vertex.glsl?raw";
 import fragmentShader from "../shaders/earth/fragment.glsl?raw";
+import pointVertexShader from "../shaders/earthPoints/vertex.glsl?raw";
+import pointFragmentShader from "../shaders/earthPoints/fragment.glsl?raw";
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -50,10 +52,33 @@ export default function () {
 
     return mesh;
   };
+  const createEarthPoints = () => {
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTexture: {
+          value: textureLoader.load("assets/earth-specular-map.png"),
+        },
+      },
+      vertexShader: pointVertexShader,
+      fragmentShader: pointFragmentShader,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+    //SphereGeometry, IcosahedronGeometry로 각각 생성하니 텍스처의 위치가 좀 다름. 계산방식이 다른거같다고 함
+    //IcosahedronGeometry로 생성할 땐 texture 위치가 다를 수 있다는 점을 기억
+    const geometry = new THREE.IcosahedronGeometry(0.9, 40, 40);
+    // 위치 조정
+    geometry.rotateY(-Math.PI);
+
+    const mesh = new THREE.Points(geometry, material);
+
+    return mesh;
+  };
 
   const create = () => {
     const earth = createEarth();
-    scene.add(earth);
+    const earthPoints = createEarthPoints();
+    scene.add(earth, earthPoints);
   };
 
   const resize = () => {
