@@ -67,7 +67,8 @@ export default function () {
       fragmentShader: pointsFragmentShader,
       side: THREE.DoubleSide,
       transparent: true,
-      depthWrite: false
+      depthWrite: false,
+      depthTest: false
     });
 
     const geometry = new THREE.IcosahedronGeometry(0.8, 30);

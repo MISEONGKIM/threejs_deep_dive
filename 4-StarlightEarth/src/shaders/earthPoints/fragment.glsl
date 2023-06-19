@@ -1,5 +1,7 @@
 uniform sampler2D uTexture;
 varying vec2 vUv;
+varying float vDistance;
+
 float circle(vec2 coord, float r) {
         //gl_PointCoord : 포인트 조각 내의 좌표
     float fromCenter = length(coord - 0.5);
@@ -22,11 +24,13 @@ float circle(vec2 coord, float r) {
 }
 void main()
 {
-    float strength = circle(gl_PointCoord, 0.01);
     vec4 map = texture2D(uTexture, vUv);
     vec3 col = 1.0 - map.rgb;
+
+    float strength = circle(gl_PointCoord, 0.01);
     //육지의 검은 포인트 부분 투명하게 하기위해 
-    float alpha = col.r * strength;
+    // vDistance : 거리에따라 포인트 어둡게 하기위해
+    float alpha = col.r * strength * vDistance;
 
 
     
