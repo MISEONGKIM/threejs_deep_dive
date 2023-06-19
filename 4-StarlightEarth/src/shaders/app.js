@@ -80,14 +80,20 @@ export default function () {
 
   const createEarthGlow = () => {
     const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uZoom: {
+          value: 1
+        }
+      },
       wireframe: false,
       vertexShader: glowVertexShader,
       fragmentShader: glowFragmentShader,
-      side: THREE.DoubleSide,
+      //뒤쪽면만 렌더링해서 광원이 있는 뒤쪽방향에 가까운 표면의 가장자리 부분만 색이 보임
+      side: THREE.BackSide,
       transparent: true
     });
 
-    const geometry = new THREE.SphereGeometry(1, 10, 10);
+    const geometry = new THREE.SphereGeometry(1, 40, 40);
 
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -98,9 +104,11 @@ export default function () {
     const earth = createEarth();
     const earthPoints = createEarthPoints();
     const earthGlow = createEarthGlow();
-    const glowNormalHelper = new VertexNormalsHelper(earthGlow, 0.2);
+    // const glowNormalHelper = new VertexNormalsHelper(earthGlow, 0.2);
 
-    scene.add(earth, earthPoints, earthGlow, glowNormalHelper);
+    scene.add(earth, earthPoints, earthGlow);
+
+    return { earthGlow };
   };
 
   const resize = () => {
@@ -118,19 +126,27 @@ export default function () {
     window.addEventListener("resize", resize);
   };
 
-  const draw = () => {
+  const draw = (obj) => {
+    const { earthGlow } = obj;
+
     controls.update();
     renderer.render(scene, camera);
+
+    //  controls.target.distanceTo(controls.object.position) :  물체와 카메라 사이의 거리값
+    earthGlow.material.uniforms.uZoom.value = controls.target.distanceTo(
+      controls.object.position
+    );
+
     requestAnimationFrame(() => {
-      draw();
+      draw(obj);
     });
   };
 
   const initialize = () => {
-    create();
+    const obj = create();
     addEvent();
     resize();
-    draw();
+    draw(obj);
   };
 
   initialize();

@@ -150,3 +150,74 @@ void main()
     gl_FragColor = vec4(greenColor, alpha);
 }
 ```
+
+## glow 효과 만들기
+
+### normal
+
+- 물체의 면이 향하는 방향
+- glsl에서는 각 정점마다 normal값을 저장하기 때문에 면 위에 있는 정점이 향하고 있는 방향에 대해서 그 정도값을 다루는 개념
+
+* VertexNormalsHelper : threejs에서 normal을 표시해주는 helper
+  - 파라미터
+    1. normal 방향을 확인하고 싶은 mesh
+    2. helper라인의 길이 값
+* mesh 객체의 wireframe: true설정하면 mesh의 정점들이 보이므로, 각 정점마다 helper라인이 수직으로 뻗어나가는 것을 확인할 수 있다.
+
+```
+import { VertexNormalsHelper } from "three/examples/jsm/helpers/VertexNormalsHelper.js";
+
+  const createEarthGlow = () => {
+    const material = new THREE.ShaderMaterial({
+      wireframe: true,
+      vertexShader: glowVertexShader,
+      fragmentShader: glowFragmentShader,
+      side: THREE.DoubleSide,
+      transparent: true
+    });
+
+    const geometry = new THREE.SphereGeometry(1, 40, 40);
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    return mesh;
+  };
+
+
+  const earthGlow = createEarthGlow();
+  const glowNormalHelper = new VertexNormalsHelper(earthGlow, 0.2);
+  scene.add(earthGlow, glowNormalHelper);
+```
+
+- helper라인 수직선의 방향에 따라 해당 정점이 어느 쪽을 바라보고 있는 지 정보를 알 수 있는 것. 그렇기 때문에 특정 좌표에서 해당 mesh로 빛을 쏴서 빛의 백터정보와 mesh의 normal값을 비교해 해당 정점에 속한 면을 더 밝게 렌더링 해야하는 지, 더 어둡게 렌더링 해야하는 지를 결정할 수 있음. 이렇게 비교해서 값을 얻는 과정을 내적이라고 함. 정확히는 두 백터의 방향이 얼마나 일치하는 지를 알기 위해 사용하는 게 내적이란 함수인 데, 용도가 그렇다 보니 빛이 물체에 비치는 정도를 구할 때도 쓰일 수 있음. 이 과정을 셰이더에서 간단하게 구할 수 있다.
+- 내적은 같은 방향을 가르키면 양수 반대방향을 가르키면 음수
+- dot()함수가 내적을 구하는 기능을 해줌.
+
+```
+varying vec3 vNormal;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+// 1보다 크지않게 정규화 : normalize(), normalMatrix
+  vNormal = normalize(normalMatrix * normal);
+
+}
+```
+
+```
+  varying vec3 vNormal;
+
+  void main() {
+    //광원의 위치정보(x좌표, y좌표, z좌표), 만약 x좌표에 3.0주면 오른쪽에 있다고 가정(x좌표에 -3.0하면 왼쪽에 있다고 가정)
+  vec3 lightSource= vec3(0.0, 0.0, -3.0);
+  float intensity = dot(vNormal, lightSource);
+
+    vec3 greenCol = vec3(0.246, 0.623, 0.557);
+
+  // 기존 색상에 빛의 강도를 적용해서 광원과 가까운 부분은 높은 내적 +1에 가까움(밝다), 멀리있는 부분은 낮은 내적 -1에 가까움(어둡다)
+    gl_FragColor = vec4(greenCol, 1.0) * intensity;
+  }
+```
