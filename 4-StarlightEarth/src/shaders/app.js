@@ -22,6 +22,8 @@ export default function () {
     width: window.innerWidth,
     height: window.innerHeight
   };
+
+  const clock = new THREE.Clock();
   const textureLoader = new THREE.TextureLoader();
 
   const scene = new THREE.Scene();
@@ -61,13 +63,18 @@ export default function () {
       uniforms: {
         uTexture: {
           value: textureLoader.load("assets/earth-specular-map.png")
+        },
+        uTime: {
+          value: 0
         }
       },
       vertexShader: pointsVertexShader,
       fragmentShader: pointsFragmentShader,
       side: THREE.DoubleSide,
       transparent: true,
-      depthWrite: false
+      depthWrite: false,
+      //씬에서 겹치는 물체의 색상을 어떻게 결합할 건지
+      blending: THREE.AdditiveBlending
     });
 
     const geometry = new THREE.IcosahedronGeometry(0.8, 30);
@@ -108,7 +115,7 @@ export default function () {
 
     scene.add(earth, earthPoints, earthGlow);
 
-    return { earthGlow };
+    return { earth, earthGlow, earthPoints };
   };
 
   const resize = () => {
@@ -127,7 +134,12 @@ export default function () {
   };
 
   const draw = (obj) => {
-    const { earthGlow } = obj;
+    const { earth, earthGlow, earthPoints } = obj;
+    earth.rotation.x += 0.0005;
+    earth.rotation.y += 0.0005;
+
+    earthPoints.rotation.x += 0.0005;
+    earthPoints.rotation.y += 0.0005;
 
     controls.update();
     renderer.render(scene, camera);
@@ -136,6 +148,7 @@ export default function () {
     earthGlow.material.uniforms.uZoom.value = controls.target.distanceTo(
       controls.object.position
     );
+    earthPoints.material.uniforms.uTime.value = clock.getElapsedTime();
 
     requestAnimationFrame(() => {
       draw(obj);

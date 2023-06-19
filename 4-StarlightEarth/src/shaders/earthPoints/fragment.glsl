@@ -1,4 +1,6 @@
 uniform sampler2D uTexture;
+uniform float uTime;
+
 varying vec2 vUv;
 varying float vDistance;
 
@@ -22,19 +24,30 @@ float circle(vec2 coord, float r) {
 
     return strength;
 }
+
+float random(vec2 uv) {
+    //이 공식은 별 의미 없음 랜덤값 생성
+    return fract(dot(uv, vec2(12.9898, 78.233))) * 43758.5453;
+}
+
 void main()
 {
     vec4 map = texture2D(uTexture, vUv);
     vec3 col = 1.0 - map.rgb;
 
-    float strength = circle(gl_PointCoord, 0.01);
+    float strength = circle(gl_PointCoord, 0.03);
     //육지의 검은 포인트 부분 투명하게 하기위해 
     // vDistance : 거리에따라 포인트 어둡게 하기위해
     float alpha = col.r * strength * vDistance;
 
+    //반짝 반짝 효과를 주기위해 
+    //uTime이 너무빨라 너무빨리반짝거려서  400.0라는 임의값으로 나눠서 느리게 반짝거리게함
+    float randomNumber = random(vUv + uTime / 400.0);
 
     
-    vec3 greenColor = vec3(0.0, 1.0, 0.0);
+    vec3 greenColor = vec3(0.08, 0.356, 0.196);
+    vec3 deepGreenColor = vec3(0.036, 0.123, 0.057);
+    vec3 finalCol = mix( greenColor, deepGreenColor, randomNumber);
 
-    gl_FragColor = vec4(greenColor, alpha);
+    gl_FragColor = vec4(finalCol, alpha);
 }

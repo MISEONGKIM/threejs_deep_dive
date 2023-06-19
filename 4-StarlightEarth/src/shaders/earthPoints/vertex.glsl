@@ -8,7 +8,7 @@ void main()
     //분모가 작을 수록 dist값은 커짐, 분모가 작다는 건 거리값이 작다는 것. 
     float dist = (1.0 / length(mvPosition.xyz)) - hiddenss;
 
-    gl_PointSize = 10.0;
+    gl_PointSize = 20.0;
     gl_Position = projectionMatrix * mvPosition;
 
     vUv = uv;
