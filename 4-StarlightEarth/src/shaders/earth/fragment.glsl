@@ -15,7 +15,7 @@ void main()
     // 2.0은 색을 더 진하게 하기위해
     float strength  = mix(map.rgb * 5.0, greenColor, vDistance).g * 2.0;
 
-    vec3 finalColor =  greenCol * strength;
+    vec3 finalColor =  greenColor * strength;
 
 
     gl_FragColor = vec4(finalColor, finalColor.g * alpha );

@@ -27,7 +27,7 @@ float circle(vec2 coord, float r) {
 
 float random(vec2 uv) {
     //이 공식은 별 의미 없음 랜덤값 생성
-    return fract(dot(uv, vec2(12.9898, 78.233))) * 43758.5453;
+    return fract(dot(uv, vec2(12.9898, 78.233)));
 }
 
 void main()

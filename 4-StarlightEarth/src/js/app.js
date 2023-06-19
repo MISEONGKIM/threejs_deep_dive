@@ -10,7 +10,7 @@ import { VertexNormalsHelper } from "three/examples/jsm/helpers/VertexNormalsHel
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
-    alpha: true
+    alpha: true,
   });
   renderer.setClearColor(0x000000, 1);
 
@@ -20,8 +20,10 @@ export default function () {
 
   const canvasSize = {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   };
+
+  const clock = new THREE.Clock();
   const textureLoader = new THREE.TextureLoader();
 
   const scene = new THREE.Scene();
@@ -41,13 +43,13 @@ export default function () {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTexture: {
-          value: textureLoader.load("assets/earth-specular-map.png")
-        }
+          value: textureLoader.load("assets/earth-specular-map.png"),
+        },
       },
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
-      transparent: true
+      transparent: true,
     });
     const geometry = new THREE.SphereGeometry(0.8, 30, 30);
 
@@ -60,15 +62,20 @@ export default function () {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTexture: {
-          value: textureLoader.load("assets/earth-specular-map.png")
-        }
+          value: textureLoader.load("assets/earth-specular-map.png"),
+        },
+        uTime: {
+          value: 0,
+        },
       },
       vertexShader: pointsVertexShader,
       fragmentShader: pointsFragmentShader,
       side: THREE.DoubleSide,
       transparent: true,
+      depthTest: false,
       depthWrite: false,
-      depthTest: false
+      //씬에서 겹치는 물체의 색상을 어떻게 결합할 건지
+      blending: THREE.AdditiveBlending,
     });
 
     const geometry = new THREE.IcosahedronGeometry(0.8, 30);
@@ -81,14 +88,19 @@ export default function () {
 
   const createEarthGlow = () => {
     const material = new THREE.ShaderMaterial({
-      wireframe: false,
+      uniforms: {
+        uZoom: {
+          value: 1,
+        },
+      },
       vertexShader: glowVertexShader,
       fragmentShader: glowFragmentShader,
-      side: THREE.DoubleSide,
-      transparent: true
+      //뒤쪽면만 렌더링해서 광원이 있는 뒤쪽방향에 가까운 표면의 가장자리 부분만 색이 보임
+      side: THREE.BackSide,
+      transparent: true,
     });
 
-    const geometry = new THREE.SphereGeometry(1, 10, 10);
+    const geometry = new THREE.SphereGeometry(1, 40, 40);
 
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -99,9 +111,11 @@ export default function () {
     const earth = createEarth();
     const earthPoints = createEarthPoints();
     const earthGlow = createEarthGlow();
-    const glowNormalHelper = new VertexNormalsHelper(earthGlow, 0.2);
+    // const glowNormalHelper = new VertexNormalsHelper(earthGlow, 0.2);
 
-    scene.add(earth, earthPoints, earthGlow, glowNormalHelper);
+    scene.add(earth, earthPoints, earthGlow);
+
+    return { earth, earthGlow, earthPoints };
   };
 
   const resize = () => {
@@ -119,19 +133,33 @@ export default function () {
     window.addEventListener("resize", resize);
   };
 
-  const draw = () => {
+  const draw = (obj) => {
+    const { earth, earthGlow, earthPoints } = obj;
+    earth.rotation.x += 0.0005;
+    earth.rotation.y += 0.0005;
+
+    earthPoints.rotation.x += 0.0005;
+    earthPoints.rotation.y += 0.0005;
+
     controls.update();
     renderer.render(scene, camera);
+
+    //  controls.target.distanceTo(controls.object.position) :  물체와 카메라 사이의 거리값
+    earthGlow.material.uniforms.uZoom.value = controls.target.distanceTo(
+      controls.object.position
+    );
+    earthPoints.material.uniforms.uTime.value = clock.getElapsedTime();
+
     requestAnimationFrame(() => {
-      draw();
+      draw(obj);
     });
   };
 
   const initialize = () => {
-    create();
+    const obj = create();
     addEvent();
     resize();
-    draw();
+    draw(obj);
   };
 
   initialize();
