@@ -2,12 +2,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import vertexShader from "../shaders/earth/vertex.glsl?raw";
 import fragmentShader from "../shaders/earth/fragment.glsl?raw";
-import pointVertexShader from "../shaders/earthPoints/vertex.glsl?raw";
-import pointFragmentShader from "../shaders/earthPoints/fragment.glsl?raw";
+import pointsVertexShader from "../shaders/earthPoints/vertex.glsl?raw";
+import pointsFragmentShader from "../shaders/earthPoints/fragment.glsl?raw";
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
-    alpha: true,
+    alpha: true
   });
   renderer.setClearColor(0x000000, 1);
 
@@ -17,7 +17,7 @@ export default function () {
 
   const canvasSize = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   };
   const textureLoader = new THREE.TextureLoader();
 
@@ -38,13 +38,13 @@ export default function () {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTexture: {
-          value: textureLoader.load("assets/earth-specular-map.png"),
-        },
+          value: textureLoader.load("assets/earth-specular-map.png")
+        }
       },
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
-      transparent: true,
+      transparent: true
     });
     const geometry = new THREE.SphereGeometry(0.8, 30, 30);
 
@@ -52,22 +52,22 @@ export default function () {
 
     return mesh;
   };
+
   const createEarthPoints = () => {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTexture: {
-          value: textureLoader.load("assets/earth-specular-map.png"),
-        },
+          value: textureLoader.load("assets/earth-specular-map.png")
+        }
       },
-      vertexShader: pointVertexShader,
-      fragmentShader: pointFragmentShader,
-      transparent: true,
+      vertexShader: pointsVertexShader,
+      fragmentShader: pointsFragmentShader,
       side: THREE.DoubleSide,
+      transparent: true,
+      depthWrite: false
     });
-    //SphereGeometry, IcosahedronGeometry로 각각 생성하니 텍스처의 위치가 좀 다름. 계산방식이 다른거같다고 함
-    //IcosahedronGeometry로 생성할 땐 texture 위치가 다를 수 있다는 점을 기억
-    const geometry = new THREE.IcosahedronGeometry(0.9, 40, 40);
-    // 위치 조정
+
+    const geometry = new THREE.IcosahedronGeometry(0.8, 30);
     geometry.rotateY(-Math.PI);
 
     const mesh = new THREE.Points(geometry, material);
@@ -78,6 +78,7 @@ export default function () {
   const create = () => {
     const earth = createEarth();
     const earthPoints = createEarthPoints();
+
     scene.add(earth, earthPoints);
   };
 
