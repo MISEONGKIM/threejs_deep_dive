@@ -46,5 +46,5 @@ const mesh = new THREE.Mesh(geometry, material);
 
 ```
   mesh.position.y = canvasSize.height / 2 - height / 2 - top;
-  mesh.position.x = -canvasSize.width / 2 + width / 2 - left;
+  mesh.position.x = -canvasSize.width / 2 + width / 2 + left;
 ```
