@@ -11,9 +11,9 @@ asscroll.enable();
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
-    alpha: true
+    alpha: true,
+    antialias: true
   });
-
   const container = document.querySelector("#container");
 
   container.appendChild(renderer.domElement);
@@ -23,6 +23,7 @@ export default function () {
     height: window.innerHeight
   };
 
+  const raycaster = new THREE.Raycaster();
   const clock = new THREE.Clock();
   const textureLoader = new THREE.TextureLoader();
   const scene = new THREE.Scene();
@@ -61,7 +62,9 @@ export default function () {
         },
         uHover: {
           value: 0
-        }
+        },
+        uHoverX: { value: 0.5 },
+        uHoverY: { value: 0.5 }
       },
       vertexShader,
       fragmentShader,
@@ -117,6 +120,29 @@ export default function () {
   };
 
   const addEvent = () => {
+    //마우스 포인트에 따라서 물결 효과를 주기 위해
+    window.addEventListener("mousemove", (e) => {
+      const pointer = {
+        //e.clientX / canvasSize.width => 0 ~ 1 사이의 값
+        //-1 ~ 1 사이의 값
+        x: (e.clientX / canvasSize.width) * 2 - 1,
+        // threejs는 위쪽이 + 아래쪽이 -라서 -1을 곱해줌
+        y: -(e.clientY / canvasSize.height) * 2 + 1
+      };
+      raycaster.setFromCamera(pointer, camera);
+
+      // raycaster에 따라서 어떤 mesh가 마우스 위에 있는 지 정보를 얻을 수 있음
+      const intersects = raycaster.intersectObjects(scene.children);
+
+      //교차하는 mesh가 없으면 return
+      if (intersects.length === 0) return;
+      let mesh = intersects[0].object;
+      //uHoverX, uHoverY를 shader의 내적 구하는 값에 사용함. fragment.glsl 참고
+      //- 0.5 :  -0.5 ~ 0.5 사이의 값을 가지도록 해서 마우스가 정 중앙일 때 물결효과가 멈추도록, 정중앙 좌표가 0,0
+      //- 0.5안하면 uv좌표에 따라 좌측하단이 0,0이라서 거기에 마우스를 대면 물결이 안침.
+      mesh.material.uniforms.uHoverX.value = intersects[0].uv.x - 0.5;
+      mesh.material.uniforms.uHoverY.value = intersects[0].uv.y - 0.5;
+    });
     window.addEventListener("resize", resize);
     imageRepository.forEach(({ img, mesh }) => {
       // 이렇게 적용해도 바로 적용안됨. canvas(#container)가 img 보다 위에 있어서, css에서 #container의 z-index를 -1로 설정해줘야함.

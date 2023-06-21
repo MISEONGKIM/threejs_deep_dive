@@ -1,6 +1,8 @@
 uniform sampler2D uTexture;
 uniform float uTime;
 uniform float uHover;
+uniform float uHoverX;
+uniform float uHoverY;
 
 varying vec2 vUv;
 
@@ -9,8 +11,10 @@ void main() {
   vec2 toCenter = vUv - 0.5; // -0.5 ~ 0.5
   float dist = length(toCenter); // 0 ~ 0.5;
   //방향에 따른 질감을 추가하기 위해 내적 사용 , 좀더 자연스러운 웨이브를 위해서 사용 
-  float dir = dot(toCenter, vec2(1.0, 1.0));
-  float strength = 0.5; 
+  //uHoverX, uHoverY : 마우스 포인트와 mesh의 거리가 가까울수록 dir은 0이 되고 
+  // 아래에서 이 값을 곱하는 수식이 있으므로 물결효과는 일어나지 않음
+  float dir = dot(toCenter, vec2(uHoverX, uHoverY));
+  float strength = 1.5; 
 
   // 0 ~ 0.5 * 20 => 0 ~ 10
     // 물결이 시간에따라 치는 느낌을 주기 위해 uTime 사용
