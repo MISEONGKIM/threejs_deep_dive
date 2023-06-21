@@ -10,14 +10,14 @@ import postVertexShader from "../shaders/postprocessing/vertex.glsl?raw";
 import postFragmentShader from "../shaders/postprocessing/fragment.glsl?raw";
 
 const asscroll = new ASScroll({
-  disableRaf: true
+  disableRaf: true,
 });
 asscroll.enable();
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
-    antialias: true
+    antialias: true,
   });
   const composer = new EffectComposer(renderer);
 
@@ -27,7 +27,7 @@ export default function () {
 
   const canvasSize = {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   };
 
   const raycaster = new THREE.Raycaster();
@@ -62,20 +62,20 @@ export default function () {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTexture: {
-          value: null
+          value: null,
         },
         uTime: {
-          value: 0
+          value: 0,
         },
         uHover: {
-          value: 0
+          value: 0,
         },
         uHoverX: { value: 0.5 },
-        uHoverY: { value: 0.5 }
+        uHoverY: { value: 0.5 },
       },
       vertexShader,
       fragmentShader,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
     });
 
     const imageMeshes = images.map((image) => {
@@ -136,10 +136,13 @@ export default function () {
     const customShader = new THREE.ShaderMaterial({
       uniforms: {
         tDiffuse: { value: null },
-        uTime: { value: 0 }
+        uTime: { value: 0 },
+        uScrolling: {
+          value: 0,
+        },
       },
       vertexShader: postVertexShader,
-      fragmentShader: postFragmentShader
+      fragmentShader: postFragmentShader,
     });
     const customPass = new ShaderPass(customShader);
     composer.addPass(customPass);
@@ -147,7 +150,26 @@ export default function () {
     return { customShader };
   };
 
-  const addEvent = () => {
+  const addEvent = (effects) => {
+    const { customShader } = effects;
+    // targetPos : 컨텐츠를 스크롤했을 때 해당 컨텐츠의 위치
+    asscroll.on("update", ({ targetPos, currentPos }) => {
+      const speed = Math.abs(targetPos - currentPos);
+
+      //speed가 5이상일 때 스크롤했다라고 판단
+      if (speed > 5) {
+        gsap.to(customShader.uniforms.uScrolling, {
+          value: 1,
+          duration: 0.5,
+        });
+        return;
+      }
+      gsap.to(customShader.uniforms.uScrolling, {
+        value: 0,
+        duration: 0.5,
+      });
+    });
+
     //마우스 포인트에 따라서 물결 효과를 주기 위해
     window.addEventListener("mousemove", (e) => {
       const pointer = {
@@ -155,7 +177,7 @@ export default function () {
         //-1 ~ 1 사이의 값
         x: (e.clientX / canvasSize.width) * 2 - 1,
         // threejs는 위쪽이 + 아래쪽이 -라서 -1을 곱해줌
-        y: -(e.clientY / canvasSize.height) * 2 + 1
+        y: -(e.clientY / canvasSize.height) * 2 + 1,
       };
       raycaster.setFromCamera(pointer, camera);
 
@@ -179,14 +201,14 @@ export default function () {
         gsap.to(mesh.material.uniforms.uHover, {
           value: 1,
           duration: 0.4,
-          ease: "power1.inOut"
+          ease: "power1.inOut",
         });
       });
       img.addEventListener("mouseout", () => {
         gsap.to(mesh.material.uniforms.uHover, {
           value: 0,
           duration: 0.4,
-          ease: "power1.inOut"
+          ease: "power1.inOut",
         });
       });
     });
@@ -212,7 +234,7 @@ export default function () {
   const initialize = async () => {
     await create();
     const effects = addPostEffects();
-    addEvent();
+    addEvent(effects);
     resize();
     draw(effects);
   };

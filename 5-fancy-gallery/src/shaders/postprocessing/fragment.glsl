@@ -1,5 +1,6 @@
 uniform sampler2D tDiffuse; //전체화면 텍스처의 정보
 uniform float uTime;
+uniform float uScrolling;
 
 varying vec2 vUv;
 
@@ -66,15 +67,34 @@ float snoise(vec2 v){
 }
 
 // 3. noise 
+// void main () {
+//   vec2 newUv = vUv;
+//   float side = smoothstep(0.2, 0.0, newUv.x) + smoothstep(0.8, 1.0, newUv.x);
+// uTime 값을 줘서 애니메이션처럼 움직이도록
+//    float noise = snoise(newUv * 500. + uTime * 2.0);
+//    newUv.x -=  side * 0.1 * noise;
+//   // newUv.x *= snoise(newUv * 10.0);
+  
+//   vec4 tex = texture2D(tDiffuse, newUv);
+//   tex += noise;
+
+//   gl_FragColor = tex;
+// }
+
+// 4. ghost  => 실제로 이런 효과 이름 없음 검색해도 안나옴, 고스트한 느낌의 효과라서 강의에서 그렇게 불렀음 
 void main () {
   vec2 newUv = vUv;
   float side = smoothstep(0.2, 0.0, newUv.x) + smoothstep(0.8, 1.0, newUv.x);
-   float noise = snoise(newUv * 500. + uTime * 2.0);
-   newUv.x -=  side * 0.1 * noise;
-  // newUv.x *= snoise(newUv * 10.0);
+  float noise = snoise(newUv + uTime * 2.0);
+  float strength = 0.1;
+  newUv += noise * strength;
   
-  vec4 tex = texture2D(tDiffuse, newUv);
-  tex += noise;
+  //원본 텍스처 
+  vec4 tex =  texture2D(tDiffuse, vUv);
+  //노이즈 효과를 입힌 텍스처 
+  vec4 blending = texture2D(tDiffuse, newUv);
+  //원본  텍스처와 블랜딩 텍스처 합한다
+  tex += blending * uScrolling;
 
   gl_FragColor = tex;
 }
