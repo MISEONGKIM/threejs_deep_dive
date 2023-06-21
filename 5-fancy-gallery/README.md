@@ -42,7 +42,7 @@ const mesh = new THREE.Mesh(geometry, material);
 ```
 
 - top -(마이너스)를 하여 좌측상단에서 top의 크기만큼 아래로 이동
-- left -(마이너스)하여 좌측상단에서 left의 크기만큼 왼쪽으로 이동
+- left +(마이너스)하여 좌측상단에서 left의 크기만큼 오른쪽으로 이동
 
 ```
   mesh.position.y = canvasSize.height / 2 - height / 2 - top;

@@ -78,8 +78,13 @@
 - smoothstep()
   - 직접 구현한 smoothy함수
     - 좀 더 부드럽게 컷팅될 수 있도록, 아래 코드에서 clamp로 만든 그라데이션을 좀 더 부드럽게 적용
-    - 셰이더 코딩에서 많이 사용되는 공식 중 하나 => y = ( x \* x) \* (3 \* 2x) : x가 1일때 y도 1
+    - 셰이더 코딩에서 많이 사용되는 공식 중 하나 => y = ( x \* x) \* (3 - 2x) : x가 1일때 y도 1
   * smoothstep() : 직접 구현한 smoothy()함수와 같은 기능을 하는 smoothstep()이란 이미 내장된 함수가 있음
+    - float smoothstep(float edge0, float edge1, float x)
+    - x가 edge0보다 작을 경우 0을 반환
+    - x가 edge1보다 크거나 같을 경우 1을 반환
+    - x가 edge0과 edge1 사이에 위치할 경우, x를 [edge0, edge1] 범위로 정규화한 값을 t라고 합시다. (즉, t = (x - edge0) / (edge1 - edge0))
+      - t를 이용하여 보간된 결과값을 계산. 계산식: t \* t \* (3.0 - 2.0 \* t)
 
 ```
 float smoothy(float edge0, float edge1, float x) {

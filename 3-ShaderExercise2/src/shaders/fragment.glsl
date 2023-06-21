@@ -88,14 +88,14 @@ void main()
 //     gl_FragColor = vec4(col, 1.0);
 
 // 7. smoothstep
-    // float x = vUv.x;
-    // float y = vUv.y;
+    float x = vUv.x;
+    float y = vUv.y;
 
-    // // float strength = smoothy(0.3, 0.7, x);
+    float strength = smoothy(0.3, 0.7, x);
     // float strength = smoothstep(0.3, 0.7, x);
-    // vec3 col = vec3(strength);
+    vec3 col = vec3(strength);
     
-    // gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(col, 1.0);
 
    // 8.mix
     // float x = vUv.x;
@@ -157,16 +157,16 @@ void main()
 //     gl_FragColor = vec4( col, 1.0);
 
 // 13. distance
-    float x = vUv.x;
-    float y = vUv.y;
+    // float x = vUv.x;
+    // float y = vUv.y;
 
-    // x 값이 0.5 ~ 0.5 사이는 0이되서 검은색  
-    // float dist = distance(x, 0.5);
+    // // x 값이 0.5 ~ 0.5 사이는 0이되서 검은색  
+    // // float dist = distance(x, 0.5);
 
-    // 가운데 검은 원처럼 보임
-     float dist = distance(vec2(x, y), vec2(0.5));
-    dist = step(0.3, dist);
+    // // 가운데 검은 원처럼 보임
+    //  float dist = distance(vec2(x, y), vec2(0.5));
+    // dist = step(0.3, dist);
 
-    vec3 col = vec3(dist);
-    gl_FragColor = vec4(col, 1.0);
+    // vec3 col = vec3(dist);
+    // gl_FragColor = vec4(col, 1.0);
 }
