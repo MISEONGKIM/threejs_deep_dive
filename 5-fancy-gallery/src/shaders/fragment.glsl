@@ -7,7 +7,7 @@ varying vec2 vUv;
 void main() {
   // vUv : 0 ~ 1
   vec2 toCenter = vUv - 0.5; // -0.5 ~ 0.5
-  float dist = length(vUv - 0.5); // 0 ~ 0.5;
+  float dist = length(toCenter); // 0 ~ 0.5;
   //방향에 따른 질감을 추가하기 위해 내적 사용 , 좀더 자연스러운 웨이브를 위해서 사용 
   float dir = dot(toCenter, vec2(1.0, 1.0));
   float strength = 0.5; 
