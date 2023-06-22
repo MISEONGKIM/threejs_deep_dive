@@ -56,3 +56,34 @@ const mesh = new THREE.Mesh(geometry, material);
 - 포스트 프로세싱 필름패스 처럼 자글자글한 효과가 노이즈
 
 * 노이즈 함수는 랜덤 함수와는 분명한 차이가 있다. 랜덤 함수는 아무 연관성없는 무작위의 난수 생성, 노이즈는 연관성이 있는 숫자값 생성 보다 더 유기적이고 일관된 구조를 가진 질감을 만들고 싶을 때 노이즈 사용함
+
+## page transition
+
+- page transition에 도움을 주는 라이브러리 : https://swup.js.org/getting-started/
+
+```
+npm install swup
+npm install @swup/js-plugin
+```
+
+- in : 페이지에 들어왔을 때 실행됨
+- out : 페이지에서 나왔을 때 실행됨
+
+```
+const swup = new Swup({
+    plugins: [
+      new SwupJsPlugin([
+        {
+          from: "(.*)",
+          to: "(.*)",
+          in: (next, infos) => {
+           ...
+          },
+          out: (next, infos) => {
+           ...
+          },
+        },
+      ]),
+    ],
+  });
+```

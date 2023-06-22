@@ -9,10 +9,18 @@ import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import postVertexShader from "../shaders/postprocessing/vertex.glsl?raw";
 import postFragmentShader from "../shaders/postprocessing/fragment.glsl?raw";
 
-const asscroll = new ASScroll({
-  disableRaf: true,
-});
-asscroll.enable();
+import Swup from "swup";
+import SwupJsPlugin from "@swup/js-plugin";
+
+let asscroll = asscrollCreate();
+
+function asscrollCreate() {
+  const ass = new ASScroll({
+    disableRaf: true,
+  });
+  ass.enable();
+  return ass;
+}
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -20,10 +28,6 @@ export default function () {
     antialias: true,
   });
   const composer = new EffectComposer(renderer);
-
-  const container = document.querySelector("#container");
-
-  container.appendChild(renderer.domElement);
 
   const canvasSize = {
     width: window.innerWidth,
@@ -43,15 +47,63 @@ export default function () {
   camera.position.set(0, 0, 50);
   camera.fov = Math.atan(canvasSize.height / 2 / 50) * (180 / Math.PI) * 2; //시야각
 
-  const imageRepository = [];
+  let imageRepository = [];
+  let animationId = "";
+  // in : 페이지에 들어왔을 때, out : 페이지에서 나왔을 때
+  const swup = new Swup({
+    plugins: [
+      new SwupJsPlugin([
+        {
+          from: "(.*)",
+          to: "(.*)",
+          in: (next, infos) => {
+            document.querySelector("#swup").style.opacity = 0;
+            gsap.to(document.querySelector("#swup"), {
+              duration: 0.5,
+              opacity: 1,
+              onComplete: () => {
+                next();
+                // 다시 초기화해주는 작업들
+                asscroll = asscrollCreate();
+
+                initialize();
+              },
+            });
+          },
+          out: (next, infos) => {
+            // 페이지 나갈 경우 clear, 안해주면 페이지 이동하고 나서 새로 또 생성하니까 스크롤도 작동안되고 이미지도 안뜸
+            asscroll.disable();
+
+            imageRepository.forEach(({ mesh }) => {
+              scene.remove(mesh);
+            });
+            imageRepository = [];
+
+            window.removeEventListener("resize", resize);
+            window.cancelAnimationFrame(animationId);
+
+            document.querySelector("#swup").style.opacity = 1;
+            gsap.to(document.querySelector("#swup"), 0, {
+              duration: 0.5,
+              opacity: 0,
+              onComplete: next,
+            });
+          },
+        },
+      ]),
+    ],
+  });
+
   const loadImages = async () => {
     const images = [...document.querySelectorAll("main .content img")];
 
     const fetchImages = images.map(
       (image) =>
         new Promise((resolve, reject) => {
-          image.onload = resolve(image);
-          image.onerror = reject;
+          const img = new Image();
+          img.src = image.src;
+          img.onload = resolve(image);
+          img.onerror = reject;
         })
     );
     const loadedImages = await Promise.all(fetchImages);
@@ -226,12 +278,16 @@ export default function () {
       mesh.material.uniforms.uTime.value = clock.getElapsedTime();
     });
 
-    requestAnimationFrame(() => {
+    animationId = requestAnimationFrame(() => {
       draw(effects);
     });
   };
 
   const initialize = async () => {
+    const container = document.querySelector("#container");
+
+    container.appendChild(renderer.domElement);
+
     await create();
     const effects = addPostEffects();
     addEvent(effects);
