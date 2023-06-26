@@ -4,7 +4,7 @@ import * as CANNON from "cannon-es";
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
-    alpha: true
+    alpha: true,
   });
   renderer.setClearColor(0x333333, 1);
   renderer.shadowMap.enabled = true;
@@ -17,7 +17,7 @@ export default function () {
 
   const canvasSize = {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   };
 
   const scene = new THREE.Scene();
@@ -47,10 +47,23 @@ export default function () {
   world.allowSleep = true;
   const worldObjects = [];
 
+  const floorMaterial = new CANNON.Material("floor");
+  const sphereMaterial = new CANNON.Material("sphere");
+  //두개의 material을 인자로 받는다
+  const contactMaterial = new CANNON.ContactMaterial(
+    floorMaterial,
+    sphereMaterial,
+    {
+      friction: 0.1,
+      restitution: 0.5,
+    }
+  );
+  world.addContactMaterial(contactMaterial);
+
   const createFloor = () => {
     const geometry = new THREE.BoxGeometry(6, 1, 6);
     const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff
+      color: 0xffffff,
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.receiveShadow = true;
@@ -60,10 +73,7 @@ export default function () {
     // 이렇게 해야  width, height, depth 각각 중심에서 모양을 만들 수 있도록 CANNONjs에서 그림을 그려줌
     const shape = new CANNON.Box(new CANNON.Vec3(6 / 2, 1 / 2, 6 / 2));
     //해당 물체의 마찰력과 탄성의 정도를 설정할 수 있게 해줌
-    const floorMaterial = new CANNON.Material({
-      friction: 0.1, //마찰력, 값이 커질 수록 물체가 더 디게 움직임
-      restitution: 0.5 //탄성, 값이 커질 수록 물체가 더 높게 튀어오름
-    });
+
     //질량을 가진 하나의 핵심적인 핵을 만드는 것
     // mass : 질량 , 0이면 물체가 움직이지 않음
     const body = new CANNON.Body({ shape, material: floorMaterial, mass: 0 });
@@ -72,12 +82,28 @@ export default function () {
     worldObjects.push({ mesh, body });
   };
 
-  const createObject = () => {
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const geometry = new THREE.PlaneGeometry(1, 1);
+  const createSphere = () => {
+    const material = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
+    const geometry = new THREE.SphereGeometry(0.3, 30, 30);
     const mesh = new THREE.Mesh(geometry, material);
-
+    mesh.castShadow = true;
+    mesh.receiveShadow = false;
     scene.add(mesh);
+
+    //물리공간에 sphere추가
+    const shape = new CANNON.Sphere(0.3);
+
+    const body = new CANNON.Body({
+      shape,
+      material: sphereMaterial,
+      mass: 1,
+    });
+    body.position.y = 5;
+    body.name = "sphere";
+
+    world.addBody(body);
+
+    worldObjects.push({ mesh, body });
   };
 
   const resize = () => {
@@ -102,6 +128,11 @@ export default function () {
     world.step(1 / 60);
     //world에 추가되어있는 box 물체의 위치와 threejs mesh로 만들었던 box의 위치를 draw내에서 동기화 시켜줘야 결과물 제대로 보임
     worldObjects.forEach(({ mesh, body }) => {
+      if (body.name === "sphere") {
+        //특정바디의 point에 힘을 가하는 함수
+        // 파라미터  : 힘의 vector, 질량의 중심이되는 상대적인 point(body의 position)
+        body.applyForce(new CANNON.Vec3(0, 0, 1), body.position);
+      }
       mesh.position.copy(body.position);
       //회전값, rotation보다 더 정확한 단위라고함
       mesh.quaternion.copy(body.quaternion);
@@ -114,7 +145,7 @@ export default function () {
   const initialize = () => {
     createLight();
     createFloor();
-    createObject();
+    createSphere();
     addEvent();
     resize();
     draw();

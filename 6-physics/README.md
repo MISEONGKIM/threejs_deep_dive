@@ -81,3 +81,28 @@
 
 
 ```
+
+## cannonjs의 강의에서 사용한 여러 함수들
+
+### ContactMaterial
+
+- 두 물체사이의 Material을 개별적으로 설정한다면 마찰력과 반발력을 계산할 때 정확하지 않은 값이 나올 수 있음.
+  - 여기서 두 물체란 예를 들어 바닥과 바닥 위에 있는 공과 같은 것, 공body에 질량을 주면 떨어져서 바닥에 닿았을 때 restitution 설정값이 있다면 튀어오를 것이다.
+  - 그런데 바닥이 모래사장(restitution 값이 작다)이냐 빙판(restitution값이 크다)이냐에 따라 튀어오르는 정도가 다르다. 즉 바닥body에도 restitution 속성이 있다.
+  - 이러한 두 물체에 개별적으로 restitution값을 준다면 정확하지 않을 수 있다는 뜻임.
+- 그렇기 때문에 두 물체의 Material을 결합해서 좀 더 정확하게 계산해줄 수 있는 ContactMaterial이라는 CannonJS에서 제공해주는 거 사용하면됨.
+
+```
+  const floorMaterial = new CANNON.Material("floor");
+  const sphereMaterial = new CANNON.Material("sphere");
+  //두개의 material을 인자로 받는다
+  const contactMaterial = new CANNON.ContactMaterial(
+    floorMaterial,
+    sphereMaterial,
+    {
+      friction: 0.1,
+      restitution: 0.5,
+    }
+  );
+  world.addContactMaterial(contactMaterial);
+```
