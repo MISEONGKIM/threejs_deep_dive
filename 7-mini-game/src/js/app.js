@@ -1,17 +1,10 @@
-import { SWorld } from "./core/World";
+import { Game } from "./scenes/game/Game";
+
 export default function () {
-  const world = SWorld;
-
-  const update = () => {
-    world.update();
-
-    window.requestAnimationFrame(() => {
-      update();
-    });
-  };
+  const game = new Game();
 
   const initailize = () => {
-    update();
+    game.play();
   };
 
   initailize();

@@ -1,5 +1,4 @@
-import { SEventEmitter } from "./EventEmitter.js";
-
+import { SEventEmitter } from "./EventEmitter";
 export class Sizer {
   width_ = 0;
   get width() {
@@ -14,6 +13,7 @@ export class Sizer {
   constructor() {
     this.width_ = window.innerWidth;
     this.height_ = window.innerHeight;
+    this.eventEmitter = SEventEmitter;
 
     window.addEventListener("resize", () => this.resize());
   }
@@ -21,5 +21,6 @@ export class Sizer {
   resize() {
     this.width_ = window.innerWidth;
     this.height_ = window.innerHeight;
+    this.eventEmitter.resize();
   }
 }

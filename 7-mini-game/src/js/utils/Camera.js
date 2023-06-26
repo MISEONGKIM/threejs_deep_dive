@@ -10,11 +10,13 @@ export class Camera extends THREE.PerspectiveCamera {
     super(75, world.sizer.width / world.sizer.height, 0.1, 100);
     this.world = world;
 
+    this.position.set(0, 2, 5);
+
     this.addControls();
   }
 
   addControls() {
-    this.controls = new OrbitControls(this, this.domElement);
+    this.controls = new OrbitControls(this, this.world.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
   }
