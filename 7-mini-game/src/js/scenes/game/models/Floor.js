@@ -18,6 +18,7 @@ export class Floor extends THREE.Mesh {
       depth,
       position
     });
+    this.receiveShadow = true;
   }
 }
 

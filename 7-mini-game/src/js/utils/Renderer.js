@@ -20,6 +20,8 @@ export class Renderer extends THREE.WebGLRenderer {
     this.setClearColor(0x333333, 1);
     this.setSize(this.sizer.width, this.sizer.height);
     this.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.shadowMap.enabled = true;
+    this.shadowMap.type = THREE.PCFSoftShadowMap;
   }
 
   resize() {
