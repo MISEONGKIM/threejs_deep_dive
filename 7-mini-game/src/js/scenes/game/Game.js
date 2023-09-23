@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import { SWorld } from "../../core/World";
-import { sPhysics } from "../../core/Physics";
-import { Floor } from "./models/Floor";
-import { Light } from "./tools/Light";
-import { Player } from "./models/Player";
+import { SWorld } from "../../core/World.js";
+import { sPhysics } from "../../core/Physics.js";
+import { Floor } from "./models/Floor.js";
+import { Light } from "./tools/Light.js";
+import { Player } from "./models/Player.js";
 
 export class Game {
   constructor() {

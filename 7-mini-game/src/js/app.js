@@ -1,4 +1,4 @@
-import { Game } from "./scenes/game/Game";
+import { Game } from "./scenes/game/Game.js";
 
 export default function () {
   const game = new Game();

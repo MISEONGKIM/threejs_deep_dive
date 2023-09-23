@@ -1,4 +1,4 @@
-import { SEventEmitter } from "./EventEmitter";
+import { SEventEmitter } from "./EventEmitter.js";
 export class Sizer {
   width_ = 0;
   get width() {

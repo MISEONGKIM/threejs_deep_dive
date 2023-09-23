@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { Renderer } from "../utils/Renderer";
-import { Camera } from "./../utils/Camera";
-import { Sizer } from "./../utils/Sizer";
-import { SEventEmitter } from "./../utils/EventEmitter";
+import { Renderer } from "../utils/Renderer.js";
+import { Camera } from "./../utils/Camera.js";
+import { Sizer } from "./../utils/Sizer.js";
+import { SEventEmitter } from "./../utils/EventEmitter.js";
 
 export class World {
   currentScene_ = null;
