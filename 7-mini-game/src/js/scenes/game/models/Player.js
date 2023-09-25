@@ -93,7 +93,7 @@ class PhysicsPlayer extends CANNON.Body {
     // 충돌했을 때 호출되는 이벤트
     this.addEventListener("collide", (e) => {
       //땅에 닿았는지 확인
-      if (e.body.name === "floor") isLanded = true;
+      if (e.body.name === "floor" && !isLanded) isLanded = true;
     });
   }
 }
