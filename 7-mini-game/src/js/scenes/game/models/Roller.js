@@ -2,8 +2,8 @@ import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import gsap from "gsap";
 
-export class Barricade extends THREE.Mesh {
-  name = "barricade";
+export class Roller extends THREE.Mesh {
+  name = "Roller";
   body_ = null;
 
   get body() {
@@ -15,15 +15,15 @@ export class Barricade extends THREE.Mesh {
   }
 
   constructor({ width, height, depth, position }) {
-    const geometry = new THREE.BoxGeometry(width, height, depth);
+    const geometry = new THREE.BoxGeometry(width, height, depth, position);
     const material = new THREE.MeshBasicMaterial({
-      color: 0x964b00
+      color: 0x4682b4
     });
 
     super(geometry, material);
     this.receiveShadow = false;
     this.castShadow = true;
-    this.body = new PhysicsBarricade({
+    this.body = new PhysicsRoller({
       width,
       height,
       depth,
@@ -32,9 +32,8 @@ export class Barricade extends THREE.Mesh {
   }
 }
 
-export class PhysicsBarricade extends CANNON.Body {
-  name = "barricade";
-  originX = 0;
+export class PhysicsRoller extends CANNON.Body {
+  name = "Roller";
 
   constructor({ width, height, depth, position }) {
     const duration = Math.random() * 2 + 0.5;
@@ -48,21 +47,26 @@ export class PhysicsBarricade extends CANNON.Body {
         depth / 2
       )
     );
-
     const material = new CANNON.Material();
 
     super({ shape, material, mass: 0, position });
-    this.originX = position.x;
     this.update(duration);
   }
 
   update(duration) {
-    gsap.to(this.position, {
+    const quaternion = {
+      y: 0
+    };
+    gsap.to(quaternion, {
       duration,
-      x: -this.originX,
-      ease: "power1.inOut",
-      yoyo: true, //애니메이션이 끝났을 때 다시 돌아오도록
-      repeat: -1
+      y: Math.PI * 2,
+      ease: "none",
+      yoyo: false, //한방향으로만
+      repeat: -1,
+      onUpdate: () => {
+        const axis = new CANNON.Vec3(0, 1, 0);
+        this.quaternion.setFromAxisAngle(axis, quaternion.y);
+      }
     });
   }
 }

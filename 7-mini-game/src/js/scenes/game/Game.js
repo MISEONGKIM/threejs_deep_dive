@@ -5,6 +5,7 @@ import { Floor } from "./models/Floor.js";
 import { Light } from "./tools/Light.js";
 import { Player } from "./models/Player.js";
 import { Barricade } from "./models/Barricade.js";
+import { Roller } from "./models/Roller.js";
 
 export class Game {
   constructor() {
@@ -68,6 +69,12 @@ export class Game {
       depth: 0.5,
       position: { x: 2, y: 1.4, z: -2 }
     });
+    this.roller = new Roller({
+      width: 0.3,
+      height: 0.3,
+      depth: 4,
+      position: { x: 0, y: 1, z: -17 }
+    });
     this.light = new Light();
 
     this.scene.add(
@@ -79,7 +86,8 @@ export class Game {
       this.light.target,
       this.barricade1,
       this.barricade2,
-      new THREE.CameraHelper(this.light.shadow.camera)
+      this.roller
+      // new THREE.CameraHelper(this.light.shadow.camera)
     );
     this.physics.add(
       this.player.body,
@@ -87,7 +95,8 @@ export class Game {
       this.floor2.body,
       this.floor3.body,
       this.barricade1.body,
-      this.barricade2.body
+      this.barricade2.body,
+      this.roller.body
     );
   }
 
@@ -100,7 +109,8 @@ export class Game {
       this.floor2,
       this.floor3,
       this.barricade1,
-      this.barricade2
+      this.barricade2,
+      this.roller
     );
 
     window.requestAnimationFrame(() => {
