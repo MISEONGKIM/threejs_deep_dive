@@ -4,6 +4,7 @@ import { sPhysics } from "../../core/Physics.js";
 import { Floor } from "./models/Floor.js";
 import { Light } from "./tools/Light.js";
 import { Player } from "./models/Player.js";
+import { Barricade } from "./models/Barricade.js";
 
 export class Game {
   constructor() {
@@ -21,8 +22,8 @@ export class Game {
       radius: 0.3,
       position: {
         x: 0,
-        y: 5,
-        z: 0
+        y: 3,
+        z: 9
       }
     });
     this.floor1 = new Floor({
@@ -55,6 +56,18 @@ export class Game {
         z: -35
       }
     });
+    this.barricade1 = new Barricade({
+      width: 1.5,
+      height: 1.5,
+      depth: 0.5,
+      position: { x: -1.5, y: 1.4, z: 3 }
+    });
+    this.barricade2 = new Barricade({
+      width: 1.5,
+      height: 1.5,
+      depth: 0.5,
+      position: { x: 2, y: 1.4, z: -2 }
+    });
     this.light = new Light();
 
     this.scene.add(
@@ -64,20 +77,31 @@ export class Game {
       this.floor3,
       this.light,
       this.light.target,
+      this.barricade1,
+      this.barricade2,
       new THREE.CameraHelper(this.light.shadow.camera)
     );
     this.physics.add(
       this.player.body,
       this.floor1.body,
       this.floor2.body,
-      this.floor3.body
+      this.floor3.body,
+      this.barricade1.body,
+      this.barricade2.body
     );
   }
 
   play() {
     this.world.update(this.player);
     this.light.update(this.world.camera);
-    this.physics.update(this.player, this.floor1, this.floor2, this.floor3);
+    this.physics.update(
+      this.player,
+      this.floor1,
+      this.floor2,
+      this.floor3,
+      this.barricade1,
+      this.barricade2
+    );
 
     window.requestAnimationFrame(() => {
       this.play();
