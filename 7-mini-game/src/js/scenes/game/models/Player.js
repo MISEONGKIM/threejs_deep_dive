@@ -4,7 +4,7 @@ import { sPhysics } from "../../../core/Physics.js";
 
 export class Player extends THREE.Mesh {
   name = "player";
-  isReset = false;
+
   constructor({ radius, position }) {
     const geometry = new THREE.SphereGeometry(radius, 30, 30);
     const material = new THREE.MeshStandardMaterial({
@@ -21,6 +21,7 @@ export class Player extends THREE.Mesh {
 
 class PhysicsPlayer extends CANNON.Body {
   name = "player";
+  isReset = false;
 
   constructor({ radius, position }) {
     const shape = new CANNON.Sphere(radius);
