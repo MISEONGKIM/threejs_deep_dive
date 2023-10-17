@@ -1,10 +1,12 @@
 import { Game } from "./scenes/game/Game.js";
+import { Home } from "./scenes/home/Home";
 
-export default function () {
-  const game = new Game();
-
+export default async function () {
+  // const game = new Game();
+  const home = new Home();
+  await home.init();
   const initailize = () => {
-    game.play();
+    home.play();
   };
 
   initailize();

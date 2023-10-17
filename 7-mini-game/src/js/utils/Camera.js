@@ -10,16 +10,8 @@ export class Camera extends THREE.PerspectiveCamera {
     super(75, world.sizer.width / world.sizer.height, 0.1, 100);
     this.world = world;
 
-    this.position.set(0, 2, 5);
-
-    this.addControls();
-  }
-
-  addControls() {
-    this.controls = new OrbitControls(this, this.world.domElement);
-    this.controls.enabled = true;
-    this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.1;
+    this.position.set(0, 20, 15);
+    this.rotation.x = -Math.PI / 3;
   }
 
   resize() {
@@ -27,7 +19,9 @@ export class Camera extends THREE.PerspectiveCamera {
     this.updateProjectionMatrix();
   }
 
-  update({ position }) {
+  update(position) {
+    if (!position) return;
+
     this.controls.update();
     this.rotation.x = -0.6;
     //플레이어의 시점에따라서 카메라의 위치를 변경
