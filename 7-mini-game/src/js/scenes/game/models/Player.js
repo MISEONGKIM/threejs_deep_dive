@@ -4,11 +4,11 @@ import { sPhysics } from "../../../core/Physics.js";
 
 export class Player extends THREE.Mesh {
   name = "player";
-
+  isReset = false;
   constructor({ radius, position }) {
     const geometry = new THREE.SphereGeometry(radius, 30, 30);
     const material = new THREE.MeshStandardMaterial({
-      color: 0xcccccc
+      color: 0xcccccc,
     });
 
     super(geometry, material);
@@ -26,7 +26,7 @@ class PhysicsPlayer extends CANNON.Body {
     const shape = new CANNON.Sphere(radius);
     const material = new CANNON.Material({
       friction: 0.1,
-      restitution: 0.5
+      restitution: 0.5,
     });
 
     super({ shape, material, mass: 10, position });
@@ -81,6 +81,7 @@ class PhysicsPlayer extends CANNON.Body {
 
     //물리시뮬레이션에서 한 스텝이 지난다음 호출되는 이벤트
     this.phsics.addEventListener("postStep", () => {
+      if (this.isReset) return;
       const x = isArrowLeftPressed ? -1 : isArrowRightPressed ? 1 : 0;
       const y = isSpacePressed && isLanded ? 5 : 0;
       const z = isArrowUpPressed ? -1 : isArrowDownPressed ? 1 : 0;
@@ -95,5 +96,12 @@ class PhysicsPlayer extends CANNON.Body {
       //땅에 닿았는지 확인
       if (e.body.name === "floor" && !isLanded) isLanded = true;
     });
+  }
+
+  reset() {
+    this.position.copy(this.initPosition);
+    this.mass = 0;
+    this.velocity.set(0, 0, 0);
+    this.isReset = true;
   }
 }

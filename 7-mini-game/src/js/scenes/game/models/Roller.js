@@ -17,7 +17,7 @@ export class Roller extends THREE.Mesh {
   constructor({ width, height, depth, position }) {
     const geometry = new THREE.BoxGeometry(width, height, depth, position);
     const material = new THREE.MeshBasicMaterial({
-      color: 0x4682b4
+      color: 0x4682b4,
     });
 
     super(geometry, material);
@@ -27,7 +27,7 @@ export class Roller extends THREE.Mesh {
       width,
       height,
       depth,
-      position
+      position,
     });
   }
 }
@@ -55,9 +55,9 @@ export class PhysicsRoller extends CANNON.Body {
 
   update(duration) {
     const quaternion = {
-      y: 0
+      y: 0,
     };
-    gsap.to(quaternion, {
+    this.anime = gsap.to(quaternion, {
       duration,
       y: Math.PI * 2,
       ease: "none",
@@ -66,7 +66,11 @@ export class PhysicsRoller extends CANNON.Body {
       onUpdate: () => {
         const axis = new CANNON.Vec3(0, 1, 0);
         this.quaternion.setFromAxisAngle(axis, quaternion.y);
-      }
+      },
     });
+  }
+
+  reset() {
+    this.anime.kill();
   }
 }

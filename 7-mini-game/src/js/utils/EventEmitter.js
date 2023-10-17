@@ -12,6 +12,14 @@ export class EventEmitter {
     //이벤트 생성
     this.eventEmitter.on("resize", callbackFn);
   }
+
+  lose() {
+    this.eventEmitter.emit("lose");
+  }
+
+  onLose(callbackFn) {
+    this.eventEmitter.on("lose", callbackFn);
+  }
 }
 
 export const SEventEmitter = new EventEmitter();

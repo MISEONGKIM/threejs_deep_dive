@@ -17,7 +17,7 @@ export class Barricade extends THREE.Mesh {
   constructor({ width, height, depth, position }) {
     const geometry = new THREE.BoxGeometry(width, height, depth);
     const material = new THREE.MeshBasicMaterial({
-      color: 0x964b00
+      color: 0x964b00,
     });
 
     super(geometry, material);
@@ -27,7 +27,7 @@ export class Barricade extends THREE.Mesh {
       width,
       height,
       depth,
-      position
+      position,
     });
   }
 }
@@ -57,12 +57,16 @@ export class PhysicsBarricade extends CANNON.Body {
   }
 
   update(duration) {
-    gsap.to(this.position, {
+    this.anime = gsap.to(this.position, {
       duration,
       x: -this.originX,
       ease: "power1.inOut",
       yoyo: true, //애니메이션이 끝났을 때 다시 돌아오도록
-      repeat: -1
+      repeat: -1,
     });
+  }
+
+  reset() {
+    this.anime.kill();
   }
 }

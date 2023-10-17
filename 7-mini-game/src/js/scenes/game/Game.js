@@ -8,11 +8,12 @@ import { Barricade } from "./models/Barricade.js";
 import { Roller } from "./models/Roller.js";
 import { Goal } from "./models/Goal";
 import { Timer } from "./tools/Timer";
+import { SEventEmitter } from "../../utils/EventEmitter.js";
 
 export class Game {
   constructor() {
     this.timer = new Timer({
-      startAt: 10,
+      startAt: 3,
       timeEl: document.querySelector(".time h1"),
     });
     this.world = SWorld;
@@ -20,8 +21,10 @@ export class Game {
     this.world.currentScene = this.scene;
 
     this.physics = sPhysics;
+    this.eventEmitter = SEventEmitter;
 
     this.addModels();
+    this.eventEmitter.onLose(() => this.reset());
   }
 
   addModels() {
@@ -113,5 +116,10 @@ export class Game {
     window.requestAnimationFrame(() => {
       this.play();
     });
+  }
+
+  reset() {
+    this.timer.stop();
+    this.models.forEach((model) => model.body.reset?.());
   }
 }
