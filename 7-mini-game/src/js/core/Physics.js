@@ -1,6 +1,8 @@
+import * as THREE from "three";
 import * as CANNON from "cannon-es";
 
 export class Physics extends CANNON.World {
+  clock = new THREE.Clock();
   constructor() {
     super();
 
@@ -14,7 +16,10 @@ export class Physics extends CANNON.World {
   }
 
   update(...models) {
-    this.step(1 / 60);
+    const deltaTime = this.clock.getDelta();
+    // 브라우저의 성능에 따라 step함수의 시간간격에 따라 오차가 발생할 수 있음
+    // 이 오차를 줄이기 위해 2번째 인자로 deltaTime 넘겨줌 => 정확하게 step 함수호출, 걍 기억해라
+    this.step(1 / 60, deltaTime);
 
     models.forEach((model) => {
       if (!model.body) return;

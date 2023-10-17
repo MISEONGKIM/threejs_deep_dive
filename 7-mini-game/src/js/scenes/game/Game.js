@@ -7,9 +7,14 @@ import { Player } from "./models/Player.js";
 import { Barricade } from "./models/Barricade.js";
 import { Roller } from "./models/Roller.js";
 import { Goal } from "./models/Goal";
+import { Timer } from "./tools/Timer";
 
 export class Game {
   constructor() {
+    this.timer = new Timer({
+      startAt: 10,
+      timeEl: document.querySelector(".time h1"),
+    });
     this.world = SWorld;
     this.scene = new THREE.Scene();
     this.world.currentScene = this.scene;
@@ -92,31 +97,18 @@ export class Game {
       this.goal
       // new THREE.CameraHelper(this.light.shadow.camera)
     );
+
+    this.models = this.scene.children.filter((c) => c.isMesh);
     this.physics.add(
-      this.player.body,
-      this.floor1.body,
-      this.floor2.body,
-      this.floor3.body,
-      this.barricade1.body,
-      this.barricade2.body,
-      this.roller.body,
-      this.goal.body
+      ...this.models.map((model) => model.body).filter((v) => !!v)
     );
   }
 
   play() {
+    this.timer.update();
     this.world.update(this.player);
     this.light.update(this.world.camera);
-    this.physics.update(
-      this.player,
-      this.floor1,
-      this.floor2,
-      this.floor3,
-      this.barricade1,
-      this.barricade2,
-      this.roller,
-      this.goal
-    );
+    this.physics.update(...this.models);
 
     window.requestAnimationFrame(() => {
       this.play();
