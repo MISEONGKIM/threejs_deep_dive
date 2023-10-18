@@ -26,8 +26,8 @@ export class Home {
       position: {
         x: 0,
         y: 0,
-        z: 0,
-      },
+        z: 0
+      }
     });
 
     this.light = new Light();
@@ -43,7 +43,8 @@ export class Home {
 
   async addGLTFModels() {
     this.bird = new Bird();
-    await this.bird.init();
+    await this.bird.init(2, { x: 0, y: 2, z: 0 });
+    this.scene.add(this.bird.instance_);
   }
 
   play() {

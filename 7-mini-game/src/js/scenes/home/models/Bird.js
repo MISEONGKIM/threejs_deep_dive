@@ -22,11 +22,20 @@ export class Bird {
 
   async init(scale, position) {
     this.instance_ = await this.load();
+    this.instance_.scale.set(scale, scale, scale);
+    this.instance_.position.set(position.x, position.y, position.z);
+    this.instance_.castShadow = true;
+    this.instance_.receiveShadow = false;
+    // traverse : child를 모두 순회하는 함수
+    this.instance_.traverse((child) =>
+      child.isMesh ? (child.castShadow = true) : null
+    );
+    this.instance_.body = new PhysicsBird(this.instance_);
   }
 
-  load() {
+  async load() {
     return new Promise((resolve) => {
-      this.loader.gltfLoader.load("public/assets/bird/scene.gltf", (gltf) => {
+      this.loader.gltfLoader.load("assets/bird/scene.gltf", (gltf) => {
         resolve(gltf.scene);
       });
     });
@@ -37,14 +46,23 @@ class PhysicsBird extends CANNON.Body {
   name = "bird";
   isReset = false;
 
-  constructor({ radius, position }) {
-    const shape = new CANNON.Sphere(radius);
+  constructor(bird) {
+    const shape = new CANNON.Sphere(0.4);
     const material = new CANNON.Material({
       friction: 0.1,
-      restitution: 0.5,
+      restitution: 0.5
     });
 
-    super({ shape, material, mass: 10, position });
+    super({
+      shape,
+      material,
+      mass: 10,
+      position: new CANNON.Vec3(
+        bird.position.x,
+        bird.position.y,
+        bird.position.z
+      )
+    });
     this.phsics = sPhysics;
 
     this.addKeyDownEvent();
