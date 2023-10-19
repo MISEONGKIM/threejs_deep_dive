@@ -14,7 +14,7 @@ export class Game {
   constructor() {
     this.timer = new Timer({
       startAt: 3,
-      timeEl: document.querySelector(".time h1"),
+      timeEl: document.querySelector(".time h1")
     });
     this.world = SWorld;
     this.scene = new THREE.Scene();
@@ -33,8 +33,8 @@ export class Game {
       position: {
         x: 0,
         y: 3,
-        z: 9,
-      },
+        z: 9
+      }
     });
     this.floor1 = new Floor({
       width: 5,
@@ -43,8 +43,8 @@ export class Game {
       position: {
         x: 0,
         y: 0,
-        z: 0,
-      },
+        z: 0
+      }
     });
     this.floor2 = new Floor({
       width: 5,
@@ -53,8 +53,8 @@ export class Game {
       position: {
         x: 0,
         y: 0,
-        z: -20,
-      },
+        z: -20
+      }
     });
     this.floor3 = new Floor({
       width: 5,
@@ -63,26 +63,26 @@ export class Game {
       position: {
         x: 0,
         y: 0,
-        z: -35,
-      },
+        z: -35
+      }
     });
     this.barricade1 = new Barricade({
       width: 1.5,
       height: 1.5,
       depth: 0.5,
-      position: { x: -1.5, y: 1.4, z: 3 },
+      position: { x: -1.5, y: 1.4, z: 3 }
     });
     this.barricade2 = new Barricade({
       width: 1.5,
       height: 1.5,
       depth: 0.5,
-      position: { x: 2, y: 1.4, z: -2 },
+      position: { x: 2, y: 1.4, z: -2 }
     });
     this.roller = new Roller({
       width: 0.3,
       height: 0.3,
       depth: 4,
-      position: { x: 0, y: 1, z: -17 },
+      position: { x: 0, y: 1, z: -17 }
     });
     this.goal = new Goal({ radius: 1, position: { x: 0, y: 1, z: -35 } });
     this.light = new Light();

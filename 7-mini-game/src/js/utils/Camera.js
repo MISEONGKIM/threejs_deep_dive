@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 export class Camera extends THREE.PerspectiveCamera {
   get sizer() {
@@ -22,7 +21,6 @@ export class Camera extends THREE.PerspectiveCamera {
   update(position) {
     if (!position) return;
 
-    this.controls.update();
     this.rotation.x = -0.6;
     //플레이어의 시점에따라서 카메라의 위치를 변경
     this.position.set(position.x, position.y + 2, position.z + 2.3);
