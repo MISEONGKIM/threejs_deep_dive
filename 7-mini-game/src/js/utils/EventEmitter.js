@@ -21,6 +21,14 @@ export class EventEmitter {
     this.eventEmitter.on("lose", callbackFn);
   }
 
+  win() {
+    this.eventEmitter.emit("win");
+  }
+
+  onWin(callbackFn) {
+    this.eventEmitter.on("win", callbackFn);
+  }
+
   enter() {
     this.eventEmitter.emit("enter");
   }
@@ -35,6 +43,10 @@ export class EventEmitter {
 
   onChangeScene(callbackFn) {
     this.eventEmitter.on("changeScene", callbackFn);
+  }
+
+  clear(e) {
+    this.eventEmitter.removeListener(e);
   }
 }
 

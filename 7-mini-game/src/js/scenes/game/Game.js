@@ -15,7 +15,7 @@ export class Game {
 
   init() {
     this.timer = new Timer({
-      startAt: 3,
+      startAt: 15,
       timeEl: document.querySelector(".time h1")
     });
     this.world = SWorld;

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { sPhysics } from "../../../core/Physics.js";
+import { SEventEmitter } from "../../../utils/EventEmitter.js";
 
 export class Player extends THREE.Mesh {
   name = "player";
@@ -8,7 +9,7 @@ export class Player extends THREE.Mesh {
   constructor({ radius, position }) {
     const geometry = new THREE.SphereGeometry(radius, 30, 30);
     const material = new THREE.MeshStandardMaterial({
-      color: 0xcccccc,
+      color: 0xcccccc
     });
 
     super(geometry, material);
@@ -27,11 +28,12 @@ class PhysicsPlayer extends CANNON.Body {
     const shape = new CANNON.Sphere(radius);
     const material = new CANNON.Material({
       friction: 0.1,
-      restitution: 0.5,
+      restitution: 0.5
     });
 
     super({ shape, material, mass: 10, position });
     this.phsics = sPhysics;
+    this.eventEmitter = SEventEmitter;
 
     this.addKeyDownEvent();
   }
@@ -96,6 +98,9 @@ class PhysicsPlayer extends CANNON.Body {
     this.addEventListener("collide", (e) => {
       //땅에 닿았는지 확인
       if (e.body.name === "floor" && !isLanded) isLanded = true;
+      if (e.body.name === "goal") {
+        this.eventEmitter.win();
+      }
     });
   }
 

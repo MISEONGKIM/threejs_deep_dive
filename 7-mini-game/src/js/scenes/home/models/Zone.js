@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { SEventEmitter } from "../../../utils/EventEmitter";
+import gsap from "gsap";
 
 export class Zone extends THREE.Mesh {
   name = "zone";
@@ -20,6 +21,16 @@ export class Zone extends THREE.Mesh {
       position
     });
     this.receiveShadow = true;
+    this.eventEmitter = SEventEmitter;
+    this.eventEmitter.onEnter(() => {
+      gsap.to(this.scale, {
+        duration: 1,
+        x: 2,
+        y: 2,
+        z: 2,
+        ease: "power1.inOut"
+      });
+    });
   }
 }
 
@@ -37,8 +48,15 @@ class PhysicsZone extends CANNON.Body {
     });
     super({ shape, material, mass: 0, position });
     this.eventEmitter = SEventEmitter;
+    this.eventEmitter.clear("enter");
     this.eventEmitter.onEnter(() => {
-      this.eventEmitter.changeScene("game");
+      this.removeShape(shape);
+      const newShape = new CANNON.Box(new CANNON.Vec3(width, height, depth));
+      this.addShape(newShape);
+
+      gsap.delayedCall(1, () => {
+        this.eventEmitter.changeScene("game");
+      });
     });
   }
 }

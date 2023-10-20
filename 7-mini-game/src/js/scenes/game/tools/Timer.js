@@ -7,7 +7,11 @@ export class Timer extends THREE.Clock {
     super();
     this.startAt = startAt;
     this.timeEl = timeEl;
-    this.eventEmiter = SEventEmitter;
+    this.eventEmitter = SEventEmitter;
+    this.eventEmitter.onWin(() => {
+      this.isEnded = true;
+      this.timeEl.textContent = "";
+    });
   }
 
   update() {
@@ -16,10 +20,14 @@ export class Timer extends THREE.Clock {
       0,
       this.startAt - Math.floor(this.getElapsedTime())
     );
+
+    if (this.timeEl) {
+      this.timeEl.textContent = this.currentTime;
+    }
     if (this.currentTime === 0) {
       this.isEnded = true;
-      this.eventEmiter.lose();
+      this.eventEmitter.lose();
+      this.timeEl.textContent = "";
     }
-    this.timeEl.textContent = this.currentTime;
   }
 }
