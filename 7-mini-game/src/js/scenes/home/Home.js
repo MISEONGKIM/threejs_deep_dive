@@ -8,6 +8,7 @@ import { Bird } from "./models/Bird";
 import { Zone } from "./models/Zone.js";
 
 export class Home {
+  initialized = false;
   async init() {
     this.world = SWorld;
     this.scene = new THREE.Scene();
@@ -17,6 +18,7 @@ export class Home {
     this.eventEmitter = SEventEmitter;
 
     await this.addModels();
+    this.initialized = true;
   }
 
   async addModels() {
@@ -56,15 +58,34 @@ export class Home {
   async addGLTFModels() {
     this.bird = new Bird();
     await this.bird.init(3, { x: 0, y: 2, z: 0 });
-    this.scene.add(this.bird.instance_);
+    this.scene.add(this.bird.instance);
   }
 
   play() {
-    this.world.update();
+    if (!this.initialized) return;
+    this.world.update(this.bird.instance, "far");
     this.physics.update(...this.models);
 
-    window.requestAnimationFrame(() => {
+    this.raf = window.requestAnimationFrame(() => {
       this.play();
     });
+  }
+
+  dispose() {
+    if (!this.initialized) return;
+
+    const children = [...this.scene.children];
+
+    children.forEach((obj) => {
+      if (obj.isMesh) {
+        obj.geometry.dispose();
+        obj.material.dispose();
+        if (obj.body) this.physics.removeBody(obj.body);
+      }
+      this.scene.remove(obj);
+    });
+
+    window.cancelAnimationFrame(this.raf);
+    this.initialized = false;
   }
 }

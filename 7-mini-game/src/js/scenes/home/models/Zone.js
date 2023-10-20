@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
+import { SEventEmitter } from "../../../utils/EventEmitter";
 
 export class Zone extends THREE.Mesh {
   name = "zone";
@@ -23,7 +24,7 @@ export class Zone extends THREE.Mesh {
 }
 
 class PhysicsZone extends CANNON.Body {
-  name = "floor";
+  name = "zone";
 
   constructor({ width, height, depth, position }) {
     const shape = new CANNON.Box(
@@ -35,5 +36,9 @@ class PhysicsZone extends CANNON.Body {
       restitution: 0.5
     });
     super({ shape, material, mass: 0, position });
+    this.eventEmitter = SEventEmitter;
+    this.eventEmitter.onEnter(() => {
+      this.eventEmitter.changeScene("game");
+    });
   }
 }

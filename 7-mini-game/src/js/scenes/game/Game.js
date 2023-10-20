@@ -11,7 +11,9 @@ import { Timer } from "./tools/Timer";
 import { SEventEmitter } from "../../utils/EventEmitter.js";
 
 export class Game {
-  constructor() {
+  initialized = false;
+
+  init() {
     this.timer = new Timer({
       startAt: 3,
       timeEl: document.querySelector(".time h1")
@@ -25,6 +27,8 @@ export class Game {
 
     this.addModels();
     this.eventEmitter.onLose(() => this.reset());
+
+    this.initialized = true;
   }
 
   addModels() {
@@ -108,12 +112,14 @@ export class Game {
   }
 
   play() {
+    if (!this.initialized) return;
+
     this.timer.update();
-    this.world.update(this.player);
+    this.world.update(this.player, "near");
     this.light.update(this.world.camera);
     this.physics.update(...this.models);
 
-    window.requestAnimationFrame(() => {
+    this.raf = window.requestAnimationFrame(() => {
       this.play();
     });
   }
@@ -121,5 +127,23 @@ export class Game {
   reset() {
     this.timer.stop();
     this.models.forEach((model) => model.body.reset?.());
+  }
+
+  dispose() {
+    if (!this.initialized) return;
+    this.reset();
+    const children = [...this.scene.children];
+
+    children.forEach((obj) => {
+      if (obj.isMesh) {
+        obj.geometry.dispose();
+        obj.material.dispose();
+        if (obj.body) this.physics.removeBody(obj.body);
+      }
+      this.scene.remove(obj);
+    });
+
+    window.cancelAnimationFrame(this.raf);
+    this.initialized = false;
   }
 }

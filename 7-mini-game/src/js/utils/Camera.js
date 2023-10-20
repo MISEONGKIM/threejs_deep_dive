@@ -18,11 +18,19 @@ export class Camera extends THREE.PerspectiveCamera {
     this.updateProjectionMatrix();
   }
 
-  update(position) {
+  update({ position }, mode) {
     if (!position) return;
-
-    this.rotation.x = -0.6;
-    //플레이어의 시점에따라서 카메라의 위치를 변경
-    this.position.set(position.x, position.y + 2, position.z + 2.3);
+    switch (mode) {
+      case "near": {
+        this.rotation.x = -0.6;
+        this.position.set(position.x, position.y + 2, position.z + 2.3);
+        break;
+      }
+      case "far": {
+        this.rotation.x = -Math.PI / 3;
+        this.position.set(position.x, position.y + 20, position.z + 15);
+        break;
+      }
+    }
   }
 }

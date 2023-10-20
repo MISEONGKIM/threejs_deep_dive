@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { sPhysics } from "../../../core/Physics.js";
 import { SLoader } from "../../../utils/Loader.js";
+import { SEventEmitter } from "../../../utils/EventEmitter.js";
 
 export class Bird {
   name = "bird";
@@ -13,22 +14,30 @@ export class Bird {
     this.body_ = body;
   }
 
+  get instance() {
+    return this.instance_;
+  }
+
+  instance_ = null;
+  set instance(instance) {
+    this.instance_ = instance;
+  }
+
   constructor() {
     this.loader = SLoader;
   }
 
   async init(scale, position) {
-    this.instance_ = await this.load();
-    console.log(this.instance_);
-    this.instance_.scale.set(scale, scale, scale);
-    this.instance_.position.set(position.x, position.y, position.z);
-    this.instance_.castShadow = true;
-    this.instance_.receiveShadow = false;
+    this.instance = await this.load();
+    this.instance.scale.set(scale, scale, scale);
+    this.instance.position.set(position.x, position.y, position.z);
+    this.instance.castShadow = true;
+    this.instance.receiveShadow = false;
     // traverse : child를 모두 순회하는 함수
-    this.instance_.traverse((child) =>
+    this.instance.traverse((child) =>
       child.isMesh ? (child.castShadow = true) : null
     );
-    this.instance_.body = new PhysicsBird(this.instance_);
+    this.instance.body = new PhysicsBird(this.instance);
   }
 
   async load() {
@@ -62,6 +71,7 @@ class PhysicsBird extends CANNON.Body {
       )
     });
     this.phsics = sPhysics;
+    this.eventEmitter = SEventEmitter;
 
     this.addKeyDownEvent();
   }
@@ -127,8 +137,14 @@ class PhysicsBird extends CANNON.Body {
       }
 
       const dot = contactNormal.dot(upAxis);
+
       if (dot > 0.5) {
         canJump = true;
+      }
+
+      // zone위에 올라와있을 경우
+      if (e.body.name === "zone" && dot > 0.5) {
+        this.eventEmitter.enter();
       }
     });
 
@@ -152,7 +168,7 @@ class PhysicsBird extends CANNON.Body {
       } else {
         ry = Math.atan2(x, z);
         this.velocity.x = x * speed;
-        this.velocity.y = y * speed;
+        this.velocity.z = z * speed;
 
         // Math.sin(ry), Math.sin(ry), Math.cos(ry) : 힘의 방향
         const force = new CANNON.Vec3(
